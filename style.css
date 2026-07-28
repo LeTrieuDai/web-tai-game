@@ -1,0 +1,624 @@
+/* style.css - Premium dark theme with glassmorphism */
+
+/* Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+:root {
+  --primary: hsl(265, 89%, 68%); /* Tím neon nổi bật */
+  --bg: hsl(220, 20%, 8%); /* Nền đen sâu (Dark Mode) */
+  --card-bg: hsla(220, 20%, 15%, 0.8); /* Card xám đen có độ trong suốt */
+  --header-bg: hsla(220, 20%, 10%, 0.95); /* Header đen mờ */
+  --text: hsl(0, 0%, 98%); /* Chữ trắng sáng */
+  --muted: hsl(220, 10%, 65%); /* Chữ xám nhạt */
+  --border: hsla(0, 0%, 100%, 0.1); /* Viền xám mờ */
+  --radius: 12px;
+  --transition: 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Header */
+#main-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--header-bg);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem; /* Khoảng cách giữa Logo và Thể loại */
+}
+
+#main-header .logo {
+
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+
+#main-header .nav-links a {
+  margin-left: 1.5rem;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+}
+/* Games Navigation Dropdown */
+.games-nav {
+  position: relative;
+  margin-left: 1.5rem;
+  cursor: pointer;
+}
+
+.games-nav .nav-item {
+  color: var(--text);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.games-nav:hover .nav-item {
+  color: var(--primary);
+}
+
+.games-nav {
+  position: relative;
+  cursor: pointer;
+  padding: 10px 0; /* Giữ bridge */
+}
+
+
+.tags-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(15px);
+  min-width: 220px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 1100;
+  margin-top: 0;
+}
+
+.tags-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+}
+
+.tags-dropdown.hidden {
+  display: none;
+}
+
+/* User dropdown (Logout) */
+#user-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 1.5rem;
+  padding: 10px 0; /* Tạo vùng đệm xung quanh avatar */
+  cursor: pointer;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(15px);
+  min-width: 150px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  padding: 0.5rem 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 1100;
+  margin-top: 0; /* Sát vào vùng padding của panel */
+}
+
+/* Cầu nối an toàn cho Đăng xuất */
+.user-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+}
+
+
+.user-dropdown a {
+  display: block;
+  padding: 0.8rem 1.2rem;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.user-dropdown a:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.user-dropdown.hidden {
+  display: none;
+}
+
+#main-header .nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+#main-header .nav-links a:hover::after {
+  transform: scaleX(1);
+}
+
+/* User panel */
+#user-panel {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+#user-panel .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--primary); /* Màu dự phòng */
+  border: 2px solid var(--primary);
+  object-fit: cover;
+}
+
+/* Admin tag management */
+.tag-item-wrapper {
+  padding: 0.3rem 0;
+  transition: var(--transition);
+}
+
+.tag-item-wrapper:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.add-tag-btn:hover {
+  text-decoration: underline;
+}
+
+
+#user-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: none;
+}
+
+#user-dropdown a:hover {
+  color: var(--primary);
+}
+
+#user-panel:hover #user-dropdown {
+  display: block;
+}
+
+.delete-tag-system {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-left: 10px;
+  opacity: 0.5;
+  transition: 0.3s;
+}
+
+.delete-tag-system:hover {
+  opacity: 1;
+}
+
+.hidden { display: none !important; }
+
+/* Games navigation */
+.games-nav {
+  display: inline-block;
+  margin-left: 1.5rem;
+}
+
+.nav-item {
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 500;
+  position: relative;
+  display: inline-block;
+  color: var(--primary);
+}
+
+.tags-dropdown {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 150px;
+  z-index: 500;
+}
+
+.tags-dropdown span {
+  display: block;
+  padding: 0.3rem 0;
+  cursor: pointer;
+}
+
+.tags-dropdown span:hover {
+  color: var(--primary);
+}
+
+/* Game cards */
+.games-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Hiển thị chính xác 3 game một hàng */
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1200px; /* Giới hạn chiều rộng để 3 game trông đẹp hơn */
+  margin: 0 auto;
+}
+
+.game-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.game-card img {
+  max-width: 100%;
+  border-radius: var(--radius);
+}
+
+.game-card h3 {
+  margin-top: 0.5rem;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--transition) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-content .close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-content button:hover {
+  background: hsl(170, 60%, 45%);
+}
+
+.error-msg {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  height: 1rem;
+  margin-top: 0.3rem;
+}
+
+/* Search Styles */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-left: 1.5rem;
+  position: relative;
+}
+.search-icon {
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  transition: var(--transition);
+}
+.search-icon:hover {
+  transform: scale(1.1);
+}
+.search-input {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  width: 250px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+.search-input.hidden, .search-icon.hidden {
+  display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .games-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 game 1 hàng cho màn hình nhỏ hơn */
+  }
+}
+
+@media (max-width: 600px) {
+  #main-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav-links {
+    margin-top: 0.5rem;
+  }
+  .games-container {
+    grid-template-columns: 1fr; /* 1 game 1 hàng cho điện thoại */
+  }
+}
+
+/* Game Detail Page Styles */
+.game-detail-container {
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.game-detail-layout {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* Section Mô tả chính (70%) */
+.game-main-section {
+  flex: 7;
+  min-width: 300px;
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Section Thông tin phụ (30%) */
+.game-info-section {
+  flex: 3;
+  min-width: 280px;
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 100px; /* Dính theo khi cuộn */
+}
+
+.game-detail-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
+}
+
+.game-detail-header h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.game-image-large {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.game-image-large img {
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  display: block;
+}
+
+.game-description-box h3 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+.game-description-box p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+}
+
+/* Style cho các mục thông tin bên phải */
+.info-section-title {
+  color: var(--primary);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.info-item {
+  margin-bottom: 1.5rem;
+}
+
+.info-item h4 {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.5px;
+}
+
+.info-item p {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.tag-badge {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-right: 0.3rem;
+  display: inline-block;
+}
+
+.download-btn-large {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 100%;
+}
+
+.download-btn-large:hover {
+  background: hsl(170, 60%, 40%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Custom Dropdown Menu for Tags */
+.custom-dropdown-menu {
+  position: absolute;
+  background: var(--card-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 9999;
+  min-width: 150px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dropdown-item {
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  color: var(--text);
+}
+
+.dropdown-item:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

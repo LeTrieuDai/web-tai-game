@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Store</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <!-- Sticky Header -->
+    <header id="main-header">
+        <div class="header-left">
+            <a href="index.html" class="logo">GameStore</a>
+            <div class="games-nav" id="games-nav-item">
+                <span class="nav-item">Thể loại</span>
+                <div class="tags-dropdown hidden" id="tags-dropdown"></div>
+            </div>
+            <div class="search-container" id="search-container">
+                <span class="search-icon" id="search-icon">🔍</span>
+                <input type="text" id="search-input" class="search-input hidden" placeholder="Tìm kiếm game..." />
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="#" id="register-btn">Đăng ký</a>
+            <a href="#" id="login-btn">Đăng nhập</a>
+        </nav>
+
+        <div class="user-panel hidden" id="user-panel">
+            <img src="avatar.png" alt="User" class="avatar" id="user-avatar" />
+            <div class="user-dropdown hidden" id="user-dropdown">
+                <a href="#" id="logout-btn">Đăng xuất</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Game cards container -->
+        <section class="games-container" id="games-container"></section>
+    </main>
+
+
+
+    <!-- Modals -->
+    <div class="modal hidden" id="login-modal">
+        <div class="modal-content">
+            <span class="close" data-close="login-modal">&times;</span>
+            <h2>Đăng nhập</h2>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Tên đăng nhập" required />
+                <input type="password" id="login-password" placeholder="Mật khẩu" required />
+                <button type="submit">Đăng nhập</button>
+                <p class="error-msg" id="login-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="register-modal">
+        <div class="modal-content">
+            <span class="close" data-close="register-modal">&times;</span>
+            <h2>Đăng ký</h2>
+            <form id="register-form">
+                <input type="text" id="register-username" placeholder="Tên đăng ký" required />
+                <input type="password" id="register-password" placeholder="Mật khẩu" required />
+
+                <button type="submit">Đăng ký</button>
+                <p class="error-msg" id="register-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
