@@ -1,6 +1,6 @@
 // script.js - Core interactivity for Game Store web app
 
-const API_URL = (window.location.hostname === 'localhost' && window.location.port !== '3000' && window.location.port !== '') 
+const API_URL = (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port !== '3000' && window.location.port !== '') 
   ? 'http://localhost:3000/api' 
   : '/api';
 
