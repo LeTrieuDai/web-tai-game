@@ -1,0 +1,37 @@
+services:
+  # ĐẠO QUÂN 1: CSDL MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: gamestore_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ĐẠO QUÂN 2: Web Node.js Game Store của bạn
+  web:
+    build: .
+    container_name: gamestore_web
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/gamestore
+
+  # ĐẠO QUÂN 3: Hệ thống n8n (AI Agent)
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: gamestore_n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  mongo_data:
+  n8n_data:

@@ -8,6 +8,7 @@
     <title>Game Store</title>
     <link rel="stylesheet" href="style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -33,6 +34,8 @@
         <div class="user-panel hidden" id="user-panel">
             <img src="avatar.png" alt="User" class="avatar" id="user-avatar" />
             <div class="user-dropdown hidden" id="user-dropdown">
+                <a href="#" id="open-profile-btn">👤 Hồ sơ & Thư viện</a>
+                <a href="#" id="open-admin-btn" class="hidden">⚙️ Quản trị hệ thống</a>
                 <a href="#" id="logout-btn">Đăng xuất</a>
             </div>
         </div>
@@ -40,9 +43,62 @@
 
     <!-- Main Content -->
     <main>
+        <!-- Hero Banner -->
+        <section class="hero" id="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <span class="hero-badge">🔥 Giá chỉ từ 1.000đ / game</span>
+                <h1 class="hero-title">Khám phá thế giới <span class="gradient-text">Game</span> không giới hạn</h1>
+                <p class="hero-subtitle">Tuyển tập tựa game đỉnh cao từ kinh dị, sinh tồn đến thế giới mở. Nạp tiền tự động qua VietQR, sở hữu game chỉ trong vài giây.</p>
+                <div class="hero-actions">
+                    <a href="#games-section" class="btn-primary">Khám phá ngay →</a>
+                    <button type="button" class="btn-ghost" id="hero-ai-btn">💬 Hỏi trợ lý AI</button>
+                </div>
+                <div class="hero-stats">
+                    <div><strong id="hero-game-count">15+</strong><span>Tựa game</span></div>
+                    <div><strong>24/7</strong><span>Trợ lý AI tư vấn</span></div>
+                    <div><strong>VietQR</strong><span>Nạp tiền tự động</span></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-controls-wrapper" id="games-section">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <h2 class="section-title" id="games-section-title">Tất cả game</h2>
+                    <span class="game-count-badge" id="games-filtered-count">35 game</span>
+                </div>
+                <div class="section-actions">
+                    <button type="button" class="wishlist-filter-btn" id="wishlist-filter-btn" title="Xem danh sách yêu thích">
+                        <span>❤️</span> <span id="wishlist-btn-text">Yêu thích (0)</span>
+                    </button>
+                    <div class="sort-select-wrap">
+                        <select id="game-sort-select" class="sort-select">
+                            <option value="default">⚡ Sắp xếp: Mặc định</option>
+                            <option value="name_asc">🔤 Tên (A → Z)</option>
+                            <option value="name_desc">🔤 Tên (Z → A)</option>
+                            <option value="rating_desc">⭐ Đánh giá cao nhất</option>
+                            <option value="rating_count">🔥 Đánh giá nhiều nhất</option>
+                        </select>
+                    </div>
+                    <button type="button" class="clear-filter-btn hidden" id="clear-filter-btn">✕ Bỏ lọc</button>
+                </div>
+            </div>
+
+            <!-- Thanh filter chips chọn nhiều thể loại -->
+            <div class="filter-chips-container" id="filter-chips-container"></div>
+        </div>
+
         <!-- Game cards container -->
         <section class="games-container" id="games-container"></section>
+
+        <!-- Thanh phân trang -->
+        <div class="pagination-container" id="pagination-container"></div>
     </main>
+
+    <footer class="site-footer">
+        © 2026 <strong>GameStore</strong> · Đồ án Web · Thanh toán an toàn qua VietQR
+    </footer>
 
 
 
@@ -72,6 +128,409 @@
                 <p class="error-msg" id="register-error"></p>
             </form>
         </div>
+    </div>
+
+    <!-- Modal Nạp Tiền VietQR -->
+    <div class="modal hidden" id="deposit-modal">
+        <div class="modal-content" style="max-width: 440px; text-align: center;">
+            <span class="close" data-close="deposit-modal">&times;</span>
+            <h2 style="margin-bottom: 0.5rem; color: var(--primary);">Nạp Tiền Vào Tài Khoản</h2>
+            <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.2rem;">Quét mã VietQR để nạp tiền tự động qua ngân hàng</p>
+
+            <div style="margin-bottom: 1rem; text-align: left;">
+                <label style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.3rem;">Chọn số tiền cần nạp:</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                    <button type="button" class="deposit-preset-btn" data-amount="5000" style="padding: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 0.85rem;">5.000đ</button>
+                    <button type="button" class="deposit-preset-btn" data-amount="10000" style="padding: 6px; background: var(--primary); border: 1px solid var(--primary); color: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">10.000đ</button>
+                    <button type="button" class="deposit-preset-btn" data-amount="20000" style="padding: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 0.85rem;">20.000đ</button>
+                    <button type="button" class="deposit-preset-btn" data-amount="50000" style="padding: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 0.85rem;">50.000đ</button>
+                    <button type="button" class="deposit-preset-btn" data-amount="100000" style="padding: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 0.85rem;">100.000đ</button>
+                    <button type="button" class="deposit-preset-btn" data-amount="200000" style="padding: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 0.85rem;">200.000đ</button>
+                </div>
+                <input type="number" id="custom-deposit-amount" value="10000" min="1000" step="1000" placeholder="Hoặc nhập số tiền tùy ý (VNĐ)" style="margin-bottom: 0.8rem;" />
+            </div>
+
+            <!-- Khung hiển thị QR code -->
+            <div id="qr-display-container" style="background: white; padding: 12px; border-radius: 10px; display: inline-block; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                <img id="vietqr-image" src="" alt="Mã QR nạp tiền" style="width: 220px; height: 220px; display: block; object-fit: contain;" />
+            </div>
+
+            <!-- Chi tiết thông tin chuyển khoản -->
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; font-size: 0.85rem; text-align: left; margin-bottom: 12px; border: 1px dashed var(--border);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--muted);">Ngân hàng:</span>
+                    <strong style="color: #4ade80;">TPBank</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--muted);">Chủ tài khoản:</span>
+                    <strong>LE TRIEU DAI</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--muted);">Số tài khoản:</span>
+                    <strong id="qr-bank-num" style="color: #60a5fa;">00000540786</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--muted);">Số tiền:</span>
+                    <strong id="qr-amount-text" style="color: #facc15;">10.000đ</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Nội dung CK:</span>
+                    <strong id="qr-content-text" style="color: var(--primary); font-size: 0.95rem; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;"></strong>
+                </div>
+            </div>
+
+            <div id="deposit-status-loading" style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 0.85rem;">
+                <span class="loading-spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid var(--muted); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                <span>Hệ thống tự động cộng tiền khi chuyển khoản thành công...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hồ sơ cá nhân & Thư viện -->
+    <div class="modal hidden" id="profile-modal">
+        <div class="modal-content modal-large">
+            <span class="close" data-close="profile-modal">&times;</span>
+            <div class="profile-header-info">
+                <div class="profile-avatar-wrap">
+                    <img id="profile-user-avatar" src="avatar.png" alt="Avatar" class="avatar-large" />
+                </div>
+                <div>
+                    <h2 id="profile-user-name" style="margin-bottom: 2px;">Tên người dùng</h2>
+                    <p style="color: var(--muted); font-size: 0.88rem;">Số dư: <strong id="profile-user-money" style="color: #facc15;">0đ</strong> · Vai trò: <span id="profile-user-role" class="badge-role">User</span></p>
+                </div>
+            </div>
+
+            <div class="custom-tabs">
+                <button type="button" class="tab-btn active" data-tab="tab-user-library">🎮 Game đã mua (<span id="profile-games-count">0</span>)</button>
+                <button type="button" class="tab-btn" data-tab="tab-user-history">💳 Lịch sử nạp tiền</button>
+                <button type="button" class="tab-btn" data-tab="tab-user-password">🔒 Đổi mật khẩu</button>
+            </div>
+
+            <!-- Tab 1: Game đã mua -->
+            <div class="tab-pane active" id="tab-user-library">
+                <div id="profile-library-grid" class="library-grid">
+                    <p style="color: var(--muted); text-align: center; padding: 2rem;">Đang tải thư viện game...</p>
+                </div>
+            </div>
+
+            <!-- Tab 2: Lịch sử nạp tiền -->
+            <div class="tab-pane" id="tab-user-history">
+                <div class="history-table-wrap">
+                    <table class="custom-table" id="profile-transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Mã GD</th>
+                                <th>Số tiền</th>
+                                <th>Nội dung</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile-transactions-body">
+                            <tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 2rem;">Chưa có giao dịch nạp tiền</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 3: Đổi mật khẩu -->
+            <div class="tab-pane" id="tab-user-password">
+                <form id="change-password-form" style="max-width: 360px; margin: 1rem auto 0;">
+                    <label style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 4px;">Mật khẩu hiện tại:</label>
+                    <input type="password" id="cp-old-password" placeholder="Nhập mật khẩu hiện tại" required />
+                    
+                    <label style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 4px;">Mật khẩu mới (ít nhất 6 ký tự):</label>
+                    <input type="password" id="cp-new-password" placeholder="Nhập mật khẩu mới" required />
+                    
+                    <label style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 4px;">Xác nhận mật khẩu mới:</label>
+                    <input type="password" id="cp-confirm-password" placeholder="Nhập lại mật khẩu mới" required />
+                    
+                    <button type="submit" style="margin-top: 0.5rem;">Cập nhật mật khẩu</button>
+                    <p class="error-msg" id="cp-error"></p>
+                    <p class="success-msg" id="cp-success" style="color: #4ade80; font-size: 0.9rem; text-align: center;"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bảng điều khiển Quản trị (Admin Dashboard) -->
+    <div class="modal hidden" id="admin-modal">
+        <div class="modal-content modal-extra-large">
+            <span class="close" data-close="admin-modal">&times;</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+                <div>
+                    <h2 style="margin: 0;" class="gradient-text">⚙️ Bảng Quản Trị Hệ Thống</h2>
+                    <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">Theo dõi doanh thu, tài khoản và quản lý kho game GameStore</p>
+                </div>
+                <button type="button" id="admin-refresh-btn" class="btn-ghost" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">🔄 Làm mới</button>
+            </div>
+
+            <div class="custom-tabs">
+                <button type="button" class="tab-btn active" data-tab="tab-admin-overview">📊 Thống kê & Doanh thu</button>
+                <button type="button" class="tab-btn" data-tab="tab-admin-games">🕹️ Quản lý Game (CRUD)</button>
+                <button type="button" class="tab-btn" data-tab="tab-admin-users">👥 Quản lý Khách hàng</button>
+            </div>
+
+            <!-- Tab 1: Thống kê & Biểu đồ -->
+            <div class="tab-pane active" id="tab-admin-overview">
+                <!-- 4 KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <span class="kpi-icon">💰</span>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Tổng doanh thu</span>
+                            <strong class="kpi-value" id="kpi-revenue" style="color: #4ade80;">0đ</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-icon">👥</span>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Tổng người dùng</span>
+                            <strong class="kpi-value" id="kpi-users">0</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-icon">🎮</span>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Tổng số game</span>
+                            <strong class="kpi-value" id="kpi-games">0</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-icon">🛒</span>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Lượt mua game</span>
+                            <strong class="kpi-value" id="kpi-purchases">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ & Top Game -->
+                <div class="admin-charts-grid">
+                    <div class="admin-chart-box">
+                        <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem;">📈 Doanh thu nạp tiền 7 ngày gần nhất</h4>
+                        <div style="height: 220px; position: relative;">
+                            <canvas id="admin-revenue-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="admin-bestsellers-box">
+                        <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem;">🔥 Top 5 Game bán chạy nhất</h4>
+                        <div id="admin-bestsellers-list" class="bestsellers-list">
+                            <p style="color: var(--muted); text-align: center; padding: 2rem;">Đang tải danh sách...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Giao dịch nạp gần nhất -->
+                <h4 style="margin: 1.5rem 0 0.6rem; font-size: 0.95rem;">🕒 Giao dịch nạp tiền gần nhất</h4>
+                <div class="history-table-wrap">
+                    <table class="custom-table" id="admin-recent-tx-table">
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Tài khoản</th>
+                                <th>Số tiền</th>
+                                <th>Cổng / Mã</th>
+                                <th>Nội dung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-recent-tx-body">
+                            <tr><td colspan="5" style="text-align: center; color: var(--muted);">Chưa có giao dịch</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 2: Quản lý Game CRUD -->
+            <div class="tab-pane" id="tab-admin-games">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--muted); font-size: 0.88rem;">Danh sách tất cả game trong cơ sở dữ liệu:</span>
+                    <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.5rem 1.2rem; font-size: 0.88rem;">+ Thêm Game Mới</button>
+                </div>
+
+                <!-- Form Thêm / Sửa Game (Ẩn mặc định) -->
+                <div id="admin-game-form-container" class="admin-form-box hidden">
+                    <h3 id="admin-game-form-title" style="margin-bottom: 1rem; color: var(--primary);">Thêm Game Mới</h3>
+                    <form id="admin-game-form">
+                        <input type="hidden" id="ag-is-edit" value="0" />
+                        <div class="form-grid-2">
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Tên Game:</label>
+                                <input type="text" id="ag-name" placeholder="Ví dụ: Elden Ring" required />
+                            </div>
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Slug (Định danh URL):</label>
+                                <input type="text" id="ag-slug" placeholder="Ví dụ: elden_ring" required />
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Link ảnh bìa (Steam / Direct URL):</label>
+                                <input type="url" id="ag-img" placeholder="https://cdn.akamai.steamstatic.com/..." required />
+                            </div>
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Giá bán (VNĐ):</label>
+                                <input type="number" id="ag-price" value="1000" min="0" step="500" required />
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Thể loại (phân tách bằng dấu phẩy):</label>
+                                <input type="text" id="ag-tags" placeholder="Hành động, Khám phá, Nhập vai" required />
+                            </div>
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted);">Nhà phát hành:</label>
+                                <input type="text" id="ag-publisher" placeholder="FromSoftware" />
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.85rem; color:var(--muted);">Mô tả ngắn về game:</label>
+                            <textarea id="ag-desc" rows="3" class="custom-textarea" placeholder="Giới thiệu nội dung, lối chơi..."></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">💾 Lưu thông tin Game</button>
+                            <button type="button" class="btn-ghost" id="ag-cancel-btn">Hủy bỏ</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bảng quản lý Game -->
+                <div class="history-table-wrap">
+                    <table class="custom-table" id="admin-games-table">
+                        <thead>
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Tên Game</th>
+                                <th>Slug</th>
+                                <th>Thể loại</th>
+                                <th>Giá</th>
+                                <th>Đánh giá</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-games-body">
+                            <tr><td colspan="7" style="text-align: center; color: var(--muted);">Đang tải danh sách game...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 3: Quản lý Khách hàng -->
+            <div class="tab-pane" id="tab-admin-users">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <span style="color: var(--muted); font-size: 0.9rem;">Danh sách tài khoản khách hàng, vai trò và quản lý số dư:</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" id="admin-user-search-input" placeholder="🔍 Tìm tên khách hàng..." style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);" />
+                    </div>
+                </div>
+
+                <!-- Form Hộp thoại Điều chỉnh Số dư (Ẩn mặc định) -->
+                <div id="admin-adjust-money-container" class="admin-form-box hidden" style="margin-bottom: 2rem; border-left: 4px solid var(--primary);">
+                    <h3 style="margin-bottom: 0.6rem; color: var(--primary);">💵 Điều Chỉnh Số Dư Khách Hàng</h3>
+                    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.2rem;">
+                        Tài khoản: <strong id="adj-target-username" style="color: #60a5fa; font-size: 1.05rem;"></strong>
+                        · Số dư hiện tại: <strong id="adj-target-money" style="color: #facc15; font-size: 1.05rem;">0đ</strong>
+                    </p>
+
+                    <form id="admin-adjust-money-form">
+                        <input type="hidden" id="adj-username-input" />
+                        
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 6px; font-weight: 600;">1. Chọn hình thức điều chỉnh:</label>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
+                                    <input type="radio" name="adj-action" value="add" checked /> 🟢 <strong>Cộng thêm tiền</strong>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
+                                    <input type="radio" name="adj-action" value="subtract" /> 🔴 <strong>Trừ bớt tiền</strong>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
+                                    <input type="radio" name="adj-action" value="set" /> 🟡 <strong>Đặt lại số dư cụ thể</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Mệnh giá nhanh -->
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 6px; font-weight: 600;">2. Chọn nhanh mệnh giá:</label>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="10000" style="padding: 5px 12px; font-size: 0.82rem;">+10.000đ</button>
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="20000" style="padding: 5px 12px; font-size: 0.82rem;">+20.000đ</button>
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="50000" style="padding: 5px 12px; font-size: 0.82rem;">+50.000đ</button>
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="100000" style="padding: 5px 12px; font-size: 0.82rem;">+100.000đ</button>
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="500000" style="padding: 5px 12px; font-size: 0.82rem;">+500.000đ</button>
+                                <button type="button" class="btn-ghost adj-preset-btn" data-val="0" style="padding: 5px 12px; font-size: 0.82rem; color: #f87171; border-color: rgba(239,68,68,0.4);">❌ Đặt về 0đ (Xóa sạch)</button>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px; font-weight: 600;">3. Số tiền (VNĐ):</label>
+                                <input type="number" id="adj-amount-input" value="50000" min="0" step="1000" required style="font-size: 1.05rem; font-weight: 700; color: #facc15;" />
+                            </div>
+                            <div>
+                                <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px; font-weight: 600;">4. Lý do / Ghi chú giao dịch:</label>
+                                <input type="text" id="adj-reason-input" placeholder="Ví dụ: Admin nạp bù / Thưởng sự kiện / Hoàn tiền" />
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 1.2rem;">
+                            <button type="submit" class="btn-primary" style="padding: 0.6rem 1.6rem;">💾 Xác Nhận Cập Nhật</button>
+                            <button type="button" class="btn-ghost" id="adj-cancel-btn">Hủy bỏ</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bảng danh sách khách hàng -->
+                <div class="history-table-wrap">
+                    <table class="custom-table" id="admin-users-table">
+                        <thead>
+                            <tr>
+                                <th>Tài khoản</th>
+                                <th>Vai trò</th>
+                                <th>Số dư</th>
+                                <th>Game đã mua</th>
+                                <th>Giỏ hàng</th>
+                                <th style="width: 230px; text-align: center;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-body">
+                            <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">Đang tải danh sách khách hàng...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút Chat và Khung Chat AI nổi -->
+    <div id="ai-chat-btn" title="Trợ lý AI tư vấn game">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+    
+    <div id="ai-chat-box" class="hidden">
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <span class="ai-chat-status"></span>
+                <strong>Trợ lý GameStore AI</strong>
+            </div>
+            <button class="ai-chat-close" id="ai-chat-close-btn">&times;</button>
+        </div>
+
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-msg bot">
+                👋 Xin chào! Tôi là Trợ lý AI của GameStore. Bạn đang tìm thể loại game nào (kinh dị, sinh tồn, thế giới mở...) để tôi tư vấn cho bạn nhé?
+            </div>
+        </div>
+
+        <form class="ai-chat-input-area" id="ai-chat-form">
+            <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Hỏi tôi bất cứ điều gì về game..." autocomplete="off" required />
+            <button type="submit" class="ai-chat-send" id="ai-chat-send-btn">➤</button>
+        </form>
     </div>
 
     <script src="script.js"></script>

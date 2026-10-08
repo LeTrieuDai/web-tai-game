@@ -24,28 +24,17 @@ const newGames = [
 
 async function addGames() {
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/gamestore');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gamestore');
         console.log('Connected to MongoDB');
 
-        // Thêm vào Database
+        // Thêm vào Database (bỏ qua nếu game đã tồn tại)
         for (let game of newGames) {
             const exists = await Game.findOne({ slug: game.slug });
             if (!exists) {
                 await Game.create(game);
                 console.log(`Đã thêm vào DB: ${game.name}`);
-            }
-        }
-
-        // Tạo file HTML cho từng game dựa trên silent_hill.html
-        const template = fs.readFileSync('silent_hill.html', 'utf-8');
-        
-        for (let game of newGames) {
-            const filePath = `${game.slug}.html`;
-            if (!fs.existsSync(filePath)) {
-                let content = template.replace(/Silent Hill/g, game.name);
-                content = content.replace(/silent_hill/g, game.slug);
-                fs.writeFileSync(filePath, content, 'utf-8');
-                console.log(`Đã tạo file giao diện: ${filePath}`);
+            } else {
+                console.log(`Bỏ qua (đã có): ${game.name}`);
             }
         }
 

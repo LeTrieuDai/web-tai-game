@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amnesia: The Dark Descent - Game Store</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header id="main-header">
+        <div class="header-left">
+            <a href="index.html" class="logo">GameStore</a>
+            <div class="games-nav" id="games-nav-item">
+                <span class="nav-item">Thể loại</span>
+                <div class="tags-dropdown hidden" id="tags-dropdown"></div>
+            </div>
+            <div class="search-container" id="search-container">
+                <span class="search-icon" id="search-icon">🔍</span>
+                <input type="text" id="search-input" class="search-input hidden" placeholder="Tìm kiếm game..." />
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="index.html#register" id="register-btn">Đăng ký</a>
+            <a href="index.html#login" id="login-btn">Đăng nhập</a>
+        </nav>
+        <div class="user-panel hidden" id="user-panel">
+            <img src="avatar.png" alt="User" class="avatar" id="user-avatar" />
+            <div class="user-dropdown hidden" id="user-dropdown">
+                <a href="#" id="logout-btn">Đăng xuất</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-detail-container" data-slug="amnesia">
+        <div class="game-detail-layout">
+            <!-- Section mô tả chính (Bên trái - 7) -->
+            <section class="game-main-section">
+                <div class="game-detail-header">
+                    <h1>Amnesia: The Dark Descent</h1>
+                </div>
+
+                <div class="game-image-large">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/57300/header.jpg" alt="Amnesia: The Dark Descent" />
+                </div>
+
+                <div class="game-description-box">
+                    <h3>Mô tả game</h3>
+                    <p>Tỉnh dậy trong một lâu đài u tối mà không còn chút ký ức nào. Không vũ khí, không cách phản kháng – bạn chỉ có thể trốn chạy và giữ cho mình khỏi phát điên.</p>
+
+                    <button class="download-btn-large" onclick="downloadGame('Amnesia: The Dark Descent')">Tải Game Ngay</button>
+                </div>
+            </section>
+
+            <!-- Section thông tin phụ (Bên phải - 3) -->
+            <section class="game-info-section">
+                <h3 class="info-section-title">Thông tin game</h3>
+
+                <div class="info-item">
+                    <h4>Nhà phát hành</h4>
+                    <p>Frictional Games</p>
+                </div>
+
+                <div class="info-item">
+                    <h4>Ngày phát hành</h4>
+                    <p>8 tháng 9, 2010</p>
+                </div>
+
+                <div class="info-item">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0;">Thể loại</h4>
+                        <span id="add-tag-to-game-btn" title="Thêm thể loại từ CSDL" style="cursor: pointer; color: var(--primary); font-size: 1.5rem; font-weight: bold; line-height: 1; display: none;">+</span>
+                    </div>
+                    <div class="game-tags" id="detail-game-tags">
+                        <!-- Sẽ được render bởi JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

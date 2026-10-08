@@ -20,14 +20,14 @@ const imageUrls = {
     'little_nightmares': 'https://cdn.akamai.steamstatic.com/steam/apps/424840/header.jpg',
     'terraria': 'https://cdn.akamai.steamstatic.com/steam/apps/105600/header.jpg',
     'the_room': 'https://cdn.akamai.steamstatic.com/steam/apps/288160/header.jpg',
-    'silent_hill': 'https://upload.wikimedia.org/wikipedia/en/a/a7/Silent_Hill_PlayStation_cover.png',
+    'silent_hill': 'https://www.honestgamers.com/images/assets/53/S/24971/1.jpg',
     'the_forest': 'https://cdn.akamai.steamstatic.com/steam/apps/242760/header.jpg',
     'portal': 'https://cdn.akamai.steamstatic.com/steam/apps/400/header.jpg'
 };
-
+``
 async function updateImages() {
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/gamestore');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gamestore');
         console.log('Connected to MongoDB');
 
         for (const slug in imageUrls) {
