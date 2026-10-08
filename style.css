@@ -1458,7 +1458,110 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
    STYLE CHO 4 TÍNH NĂNG NÂNG CẤP MỚI
    =================================================== */
 
-/* 1. SECTION CONTROLS & BỘ LỌC ĐA NĂNG */
+/* 1. LAYOUT 2 CỘT & BỘ LỌC STICKY BÊN PHẢI */
+.games-layout-wrapper {
+  display: flex;
+  gap: 2rem;
+  max-width: 1350px;
+  margin: 2rem auto 3.5rem;
+  padding: 0 1.5rem;
+  align-items: flex-start;
+  scroll-margin-top: 85px;
+}
+
+.games-main-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.games-main-column .section-header {
+  margin-bottom: 1.4rem;
+  padding: 0;
+}
+
+.games-main-column .games-container {
+  padding: 0 0 2rem 0;
+  margin: 0;
+  max-width: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+}
+
+/* Cột Bộ Lọc Dính (Sticky Sidebar bên phải) */
+.filter-sidebar-sticky {
+  width: 310px;
+  flex-shrink: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 85px;
+  align-self: flex-start;
+  z-index: 25;
+}
+
+.filter-sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.4rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  transition: var(--transition);
+}
+
+.filter-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.filter-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.filter-card-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sort-select.full-width {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 0.88rem;
+}
+
+.wishlist-filter-btn.full-width {
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+}
+
 .section-controls-wrapper {
   max-width: 1200px;
   margin: 2rem auto 0;
@@ -1569,6 +1672,31 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 14px -4px hsla(265, 89%, 60%, 0.8);
+}
+
+/* Responsive cho Layout 2 cột và Bảng lọc Sticky */
+@media (max-width: 1150px) {
+  .games-main-column .games-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .games-layout-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .filter-sidebar-sticky {
+    width: 100%;
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 580px) {
+  .games-main-column .games-container {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* Nút Trái tim Wishlist trên thẻ game */

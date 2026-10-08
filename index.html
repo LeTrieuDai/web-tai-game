@@ -62,38 +62,71 @@
             </div>
         </section>
 
-        <div class="section-controls-wrapper" id="games-section">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <h2 class="section-title" id="games-section-title">Tất cả game</h2>
-                    <span class="game-count-badge" id="games-filtered-count">35 game</span>
-                </div>
-                <div class="section-actions">
-                    <button type="button" class="wishlist-filter-btn" id="wishlist-filter-btn" title="Xem danh sách yêu thích">
-                        <span>❤️</span> <span id="wishlist-btn-text">Yêu thích (0)</span>
-                    </button>
-                    <div class="sort-select-wrap">
-                        <select id="game-sort-select" class="sort-select">
-                            <option value="default">⚡ Sắp xếp: Mặc định</option>
-                            <option value="name_asc">🔤 Tên (A → Z)</option>
-                            <option value="name_desc">🔤 Tên (Z → A)</option>
-                            <option value="rating_desc">⭐ Đánh giá cao nhất</option>
-                            <option value="rating_count">🔥 Đánh giá nhiều nhất</option>
-                        </select>
+        <!-- Khu vực hiển thị Game và Bảng lọc Sticky bên phải -->
+        <div class="games-layout-wrapper" id="games-section">
+            <!-- CỘT TRÁI: Tiêu đề + Danh sách Game + Phân trang -->
+            <div class="games-main-column">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <h2 class="section-title" id="games-section-title">Tất cả game</h2>
+                        <span class="game-count-badge" id="games-filtered-count">35 game</span>
                     </div>
-                    <button type="button" class="clear-filter-btn hidden" id="clear-filter-btn">✕ Bỏ lọc</button>
                 </div>
+
+                <!-- Game cards container -->
+                <section class="games-container" id="games-container"></section>
+
+                <!-- Thanh phân trang -->
+                <div class="pagination-container" id="pagination-container"></div>
             </div>
 
-            <!-- Thanh filter chips chọn nhiều thể loại -->
-            <div class="filter-chips-container" id="filter-chips-container"></div>
+            <!-- CỘT PHẢI: Bảng vuông lọc & sắp xếp (Tự trượt đi theo khi cuộn trang) -->
+            <aside class="filter-sidebar-sticky">
+                <div class="filter-sidebar-card">
+                    <div class="filter-card-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.15rem;">🎯</span>
+                            <h3 class="filter-card-title">Bộ Lọc & Sắp Xếp</h3>
+                        </div>
+                        <button type="button" class="clear-filter-btn hidden" id="clear-filter-btn" title="Xóa tất cả bộ lọc">✕ Bỏ lọc</button>
+                    </div>
+
+                    <!-- 1. Sắp xếp -->
+                    <div class="filter-card-section">
+                        <label class="filter-card-label" for="game-sort-select">
+                            <span>⚡ Sắp xếp theo</span>
+                        </label>
+                        <div class="sort-select-wrap">
+                            <select id="game-sort-select" class="sort-select full-width">
+                                <option value="default">⚡ Sắp xếp: Mặc định</option>
+                                <option value="name_asc">🔤 Tên (A → Z)</option>
+                                <option value="name_desc">🔤 Tên (Z → A)</option>
+                                <option value="rating_desc">⭐ Đánh giá cao nhất</option>
+                                <option value="rating_count">🔥 Đánh giá nhiều nhất</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 2. Yêu thích -->
+                    <div class="filter-card-section">
+                        <label class="filter-card-label">
+                            <span>❤️ Bộ sưu tập</span>
+                        </label>
+                        <button type="button" class="wishlist-filter-btn full-width" id="wishlist-filter-btn" title="Xem danh sách yêu thích">
+                            <span>❤️</span> <span id="wishlist-btn-text">Yêu thích (0)</span>
+                        </button>
+                    </div>
+
+                    <!-- 3. Thể loại game -->
+                    <div class="filter-card-section">
+                        <label class="filter-card-label">
+                            <span>🏷️ Thể loại game</span>
+                        </label>
+                        <div class="filter-chips-container sidebar-chips" id="filter-chips-container"></div>
+                    </div>
+                </div>
+            </aside>
         </div>
-
-        <!-- Game cards container -->
-        <section class="games-container" id="games-container"></section>
-
-        <!-- Thanh phân trang -->
-        <div class="pagination-container" id="pagination-container"></div>
     </main>
 
     <footer class="site-footer">
