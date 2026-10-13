@@ -1667,8 +1667,45 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+/**
+ * Đảm bảo modal quản lý thể loại game (Admin) tồn tại trên trang
+ */
+function ensureAdminTagModalExists() {
+  if (document.getElementById('admin-tag-modal')) return;
+  const adminTagModalHTML = `
+    <div class="modal hidden" id="admin-tag-modal">
+        <div class="modal-content" style="max-width: 500px; text-align: left; position: relative;">
+            <span class="close" data-close="admin-tag-modal">&times;</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 1.5rem;">🏷️</span>
+                <h3 class="gradient-text" style="margin: 0; font-size: 1.25rem;">Quản Lý Thể Loại Game</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.84rem; margin-bottom: 1.2rem;">
+                Thêm thể loại mới hoặc xem/xóa các thể loại đang có trong hệ thống GameStore.
+            </p>
+
+            <form id="admin-new-tag-form" style="display: flex; gap: 8px; margin-bottom: 1.5rem;">
+                <input type="text" id="admin-new-tag-input" placeholder="Nhập tên tag mới (Ví dụ: Bắn súng, Chiến thuật...)" required style="flex: 1; padding: 9px 12px; font-size: 0.9rem;" />
+                <button type="submit" class="btn-primary" style="padding: 9px 16px; font-size: 0.88rem; white-space: nowrap; font-weight: 600;">+ Thêm Tag</button>
+            </form>
+
+            <label style="font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Các thể loại hiện có trong hệ thống:</label>
+            <div id="admin-tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 220px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px;">
+                <span style="color: var(--muted); font-size: 0.85rem;">Đang tải danh sách thể loại...</span>
+            </div>
+
+            <div style="margin-top: 1.2rem; text-align: right;">
+                <button type="button" class="btn-ghost" onclick="closeModal('admin-tag-modal')" style="padding: 8px 16px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', adminTagModalHTML);
+}
+
 function ensureModalsExist() {
   ensureDownloadModalExists();
+  ensureAdminTagModalExists();
   // Neu dang o trang admin.html chuyen dung thi tuyet doi khong chen modal trung lap
   if (document.getElementById('admin-main-content')) {
     return;
@@ -1817,7 +1854,10 @@ function ensureModalsExist() {
           <div class="tab-pane" id="tab-admin-games">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
               <span style="color: var(--muted); font-size: 0.88rem;">Danh sách tất cả game trong cơ sở dữ liệu:</span>
-              <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.5rem 1.2rem; font-size: 0.88rem;">+ Thêm Game Mới</button>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" class="btn-ghost" id="admin-add-tag-btn" style="padding: 0.5rem 1rem; font-size: 0.88rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.4); display: flex; align-items: center; gap: 6px; cursor: pointer;">🏷️ + Thêm tag game</button>
+                <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.5rem 1.2rem; font-size: 0.88rem;">+ Thêm Game Mới</button>
+              </div>
             </div>
             <div id="admin-game-form-container" class="admin-form-box hidden">
               <h3 id="admin-game-form-title" style="margin-bottom: 1rem; color: var(--primary);">Thêm Game Mới</h3>
@@ -1845,18 +1885,26 @@ function ensureModalsExist() {
                 </div>
                 <div class="form-grid-2">
                   <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Thể loại (phân tách bằng dấu phẩy):</label>
-                    <input type="text" id="ag-tags" placeholder="Hành động, Khám phá, Nhập vai" required />
-                  </div>
-                  <div>
                     <label style="font-size:0.85rem; color:var(--muted);">Nhà phát hành:</label>
                     <input type="text" id="ag-publisher" placeholder="FromSoftware" />
                   </div>
+                  <div>
+                    <label style="font-size:0.85rem; color:#60a5fa; display: flex; align-items: center; gap: 5px; font-weight: 600;">
+                      📁 Link tải game (Google Drive):
+                    </label>
+                    <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; border-color: rgba(96, 165, 250, 0.4);" />
+                  </div>
                 </div>
                 <div style="margin-bottom: 0.8rem;">
-                  <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Link tải game (Google Drive):</label>
-                  <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%;" />
-                  <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:3px;">Link Google Drive chứa bộ cài game dành cho khách sau khi mua.</small>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size:0.85rem; color:var(--muted); font-weight: 600;">🏷️ Thể loại game (Nhấp dấu + để chọn):</label>
+                    <button type="button" id="ag-quick-add-tag-btn" class="btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); cursor: pointer;">+ Thêm tag mới vào hệ thống</button>
+                  </div>
+                  <div id="ag-tags-picker" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; min-height: 44px; align-items: center;">
+                    <!-- Dynamic chips generated via JS -->
+                  </div>
+                  <input type="hidden" id="ag-tags" value="" />
+                  <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:4px;">Nhấp vào tag có dấu <strong>+</strong> để gắn vào game, nhấp vào tag màu tím có dấu <strong>✓</strong> để bỏ chọn.</small>
                 </div>
                 <div>
                   <label style="font-size:0.85rem; color:var(--muted);">Mô tả ngắn về game:</label>
@@ -2155,17 +2203,20 @@ let adminChartInstance = null;
 
 function setupAdminDashboard() {
   let cachedAdminUsers = [];
+  let currentFormSelectedTags = [];
 
   async function loadAdminData() {
     try {
-      const [statsRes, gamesRes, usersRes] = await Promise.all([
+      const [statsRes, gamesRes, usersRes, tagsRes] = await Promise.all([
         fetch(`${API_URL}/admin/stats`),
         fetch(`${API_URL}/games`),
-        fetch(`${API_URL}/admin/users`)
+        fetch(`${API_URL}/admin/users`),
+        fetch(`${API_URL}/tags`)
       ]);
       const stats = await statsRes.json();
       const games = await gamesRes.json();
       const users = await usersRes.json();
+      if (tagsRes.ok) allTagsList = await tagsRes.json();
 
       // 1. KPI Cards
       const revEl = document.getElementById('kpi-revenue');
@@ -2431,6 +2482,94 @@ function setupAdminDashboard() {
     box.scrollIntoView({ behavior: 'smooth' });
   }
 
+  function renderFormTagsPicker() {
+    const container = document.getElementById('ag-tags-picker');
+    const hiddenInput = document.getElementById('ag-tags');
+    if (!container) return;
+
+    if (hiddenInput) {
+      hiddenInput.value = currentFormSelectedTags.join(', ');
+    }
+
+    const tagsToRender = (allTagsList && allTagsList.length > 0) ? allTagsList : ['Kinh dị', 'Sinh tồn', 'Khám phá', 'Giải đố'];
+
+    container.innerHTML = tagsToRender.map(tag => {
+      const isSelected = currentFormSelectedTags.includes(tag);
+      if (isSelected) {
+        return `
+          <span class="ag-tag-chip active" data-tag="${escapeHtml(tag)}" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(139,92,246,0.35); transition: 0.2s;" title="Nhấp để gỡ thể loại này khỏi game">
+            ✓ ${escapeHtml(tag)} <span style="opacity:0.8; font-size:0.75rem;">✕</span>
+          </span>
+        `;
+      } else {
+        return `
+          <span class="ag-tag-chip inactive" data-tag="${escapeHtml(tag)}" style="background: rgba(255,255,255,0.06); color: var(--text); border: 1px dashed rgba(255,255,255,0.25); padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;" title="Nhấp để thêm thể loại này vào game">
+            + ${escapeHtml(tag)}
+          </span>
+        `;
+      }
+    }).join('');
+
+    container.querySelectorAll('.ag-tag-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const t = chip.dataset.tag;
+        if (currentFormSelectedTags.includes(t)) {
+          currentFormSelectedTags = currentFormSelectedTags.filter(x => x !== t);
+        } else {
+          currentFormSelectedTags.push(t);
+        }
+        renderFormTagsPicker();
+      });
+    });
+  }
+
+  async function openTagsManagementModal() {
+    openModal('admin-tag-modal');
+    await loadAndRenderTagsList();
+  }
+
+  async function loadAndRenderTagsList() {
+    const listCont = document.getElementById('admin-tags-list');
+    if (!listCont) return;
+
+    try {
+      const res = await fetch(`${API_URL}/tags`);
+      if (res.ok) {
+        allTagsList = await res.json();
+      }
+    } catch (e) {}
+
+    const tags = allTagsList || [];
+    if (tags.length === 0) {
+      listCont.innerHTML = '<span style="color:var(--muted); font-size:0.85rem;">Chưa có thể loại nào</span>';
+      return;
+    }
+
+    listCont.innerHTML = tags.map(t => `
+      <span style="background: rgba(255,255,255,0.06); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px;">
+        🏷️ ${escapeHtml(t)}
+        <button type="button" class="admin-delete-tag-btn" data-tag="${escapeHtml(t)}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0; font-size: 0.9rem; line-height: 1;" title="Xóa tag này">&times;</button>
+      </span>
+    `).join('');
+
+    listCont.querySelectorAll('.admin-delete-tag-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const tagName = btn.dataset.tag;
+        if (confirm(`Bạn có chắc muốn xóa thể loại "${tagName}" khỏi hệ thống?`)) {
+          const delRes = await fetch(`${API_URL}/tags/${encodeURIComponent(tagName)}`, { method: 'DELETE' });
+          if (delRes.ok) {
+            showToast(`Đã xóa thể loại ${tagName}`);
+            allTagsList = allTagsList.filter(x => x !== tagName);
+            currentFormSelectedTags = currentFormSelectedTags.filter(x => x !== tagName);
+            loadAndRenderTagsList();
+            renderFormTagsPicker();
+            if (typeof fetchAllGamesAndTags === 'function') fetchAllGamesAndTags();
+          }
+        }
+      });
+    });
+  }
+
   function openGameForm(isEdit, game = null) {
     const formBox = document.getElementById('admin-game-form-container');
     const title = document.getElementById('admin-game-form-title');
@@ -2449,18 +2588,21 @@ function setupAdminDashboard() {
       slugInput.disabled = true; // Không cho sửa slug khi update
       document.getElementById('ag-img').value = game.img || '';
       document.getElementById('ag-price').value = game.price || 1000;
-      document.getElementById('ag-tags').value = (game.tags || []).join(', ');
       document.getElementById('ag-publisher').value = game.publisher || '';
       const dlInput = document.getElementById('ag-download-url');
       if (dlInput) dlInput.value = game.downloadUrl || '';
       document.getElementById('ag-desc').value = game.desc || '';
+      currentFormSelectedTags = Array.isArray(game.tags) ? [...game.tags] : (game.tags ? game.tags.split(',').map(t=>t.trim()).filter(Boolean) : []);
     } else {
       title.textContent = 'Thêm Game Mới';
       document.getElementById('admin-game-form').reset();
       slugInput.disabled = false;
       const dlInput = document.getElementById('ag-download-url');
       if (dlInput) dlInput.value = '';
+      currentFormSelectedTags = [];
     }
+
+    renderFormTagsPicker();
     formBox.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -2541,6 +2683,19 @@ function setupAdminDashboard() {
     if (closeDlBtn) {
       closeModal('download-game-modal');
     }
+
+    // Mở modal thêm / quản lý tag game
+    const addTagBtn = e.target.closest('#admin-add-tag-btn, #ag-quick-add-tag-btn');
+    if (addTagBtn) {
+      e.preventDefault();
+      openTagsManagementModal();
+    }
+
+    // Đóng modal quản lý tag game
+    const closeTagModalBtn = e.target.closest('[data-close="admin-tag-modal"]');
+    if (closeTagModalBtn) {
+      closeModal('admin-tag-modal');
+    }
   });
 
   // Tìm kiếm khách hàng
@@ -2549,6 +2704,38 @@ function setupAdminDashboard() {
       const kw = e.target.value.trim().toLowerCase();
       const filtered = cachedAdminUsers.filter(u => u.username.toLowerCase().includes(kw));
       renderAdminUsersTable(filtered);
+    }
+  });
+
+  // Submit Thêm thể loại mới (Tag)
+  document.addEventListener('submit', async (e) => {
+    if (e.target && e.target.id === 'admin-new-tag-form') {
+      e.preventDefault();
+      const input = document.getElementById('admin-new-tag-input');
+      const val = (input?.value || '').trim();
+      if (!val) return;
+
+      try {
+        const res = await fetch(`${API_URL}/tags`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: val })
+        });
+        if (res.ok) {
+          showToast(`Đã thêm thể loại "${val}"!`);
+          if (input) input.value = '';
+          if (!allTagsList.includes(val)) allTagsList.push(val);
+          if (!currentFormSelectedTags.includes(val)) currentFormSelectedTags.push(val);
+          await loadAndRenderTagsList();
+          renderFormTagsPicker();
+          if (typeof fetchAllGamesAndTags === 'function') fetchAllGamesAndTags();
+        } else {
+          const errData = await res.json();
+          alert(errData.error || 'Lỗi thêm thể loại');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ');
+      }
     }
   });
 
@@ -2561,7 +2748,7 @@ function setupAdminDashboard() {
       const slug = document.getElementById('ag-slug').value;
       const img = document.getElementById('ag-img').value;
       const price = document.getElementById('ag-price').value;
-      const tags = document.getElementById('ag-tags').value;
+      const tags = (currentFormSelectedTags && currentFormSelectedTags.length > 0) ? currentFormSelectedTags.join(', ') : (document.getElementById('ag-tags')?.value || '');
       const publisher = document.getElementById('ag-publisher').value;
       const downloadUrl = (document.getElementById('ag-download-url')?.value || '').trim();
       const desc = document.getElementById('ag-desc').value;

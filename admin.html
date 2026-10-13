@@ -157,7 +157,12 @@
                     <div>
                         <span style="color: var(--muted); font-size: 0.9rem;">Danh sách toàn bộ game hiện có trong kho dữ liệu MongoDB:</span>
                     </div>
-                    <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">+ Thêm Game Mới</button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" class="btn-ghost" id="admin-add-tag-btn" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.4); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            🏷️ + Thêm tag game
+                        </button>
+                        <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">+ Thêm Game Mới</button>
+                    </div>
                 </div>
 
                 <!-- Form Thêm / Sửa Game -->
@@ -187,18 +192,26 @@
                         </div>
                         <div class="form-grid-2">
                             <div>
-                                <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Thể loại (cách nhau bởi dấu phẩy):</label>
-                                <input type="text" id="ag-tags" placeholder="Hành động, Nhập vai, Khám phá" />
-                            </div>
-                            <div>
                                 <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Nhà phát hành:</label>
                                 <input type="text" id="ag-publisher" placeholder="FromSoftware" />
                             </div>
+                            <div>
+                                <label style="font-size:0.85rem; color:#60a5fa; display: flex; align-items: center; gap: 5px; margin-bottom: 4px; font-weight: 600;">
+                                    📁 Link tải game (Google Drive):
+                                </label>
+                                <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid rgba(96, 165, 250, 0.4); color: var(--text);" />
+                            </div>
                         </div>
                         <div style="margin-bottom: 1.2rem;">
-                            <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Link tải game (Google Drive):</label>
-                            <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);" />
-                            <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:3px;">Link Google Drive chứa bộ cài game dành cho khách sau khi mua.</small>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-size:0.85rem; color:var(--muted); font-weight: 600;">🏷️ Thể loại game (Nhấp dấu + để chọn):</label>
+                                <button type="button" id="ag-quick-add-tag-btn" class="btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); cursor: pointer;">+ Thêm tag mới vào hệ thống</button>
+                            </div>
+                            <div id="ag-tags-picker" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; min-height: 44px; align-items: center;">
+                                <!-- Dynamic tag chips generated via script.js -->
+                            </div>
+                            <input type="hidden" id="ag-tags" value="" />
+                            <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:4px;">Nhấp vào tag có dấu <strong>+</strong> để gắn vào game, nhấp vào tag màu tím có dấu <strong>✓</strong> để bỏ chọn.</small>
                         </div>
                         <div style="margin-bottom: 1.2rem;">
                             <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Mô tả chi tiết:</label>
@@ -351,10 +364,39 @@
         </div>
     </div>
 
+    <!-- Modal Quản Lý & Thêm Tag Game (Admin) -->
+    <div class="modal hidden" id="admin-tag-modal">
+        <div class="modal-content" style="max-width: 500px; text-align: left; position: relative;">
+            <span class="close" data-close="admin-tag-modal">&times;</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 1.5rem;">🏷️</span>
+                <h3 class="gradient-text" style="margin: 0; font-size: 1.25rem;">Quản Lý Thể Loại Game</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.84rem; margin-bottom: 1.2rem;">
+                Thêm thể loại mới hoặc xem/xóa các thể loại đang có trong hệ thống GameStore.
+            </p>
+
+            <!-- Form thêm tag mới -->
+            <form id="admin-new-tag-form" style="display: flex; gap: 8px; margin-bottom: 1.5rem;">
+                <input type="text" id="admin-new-tag-input" placeholder="Nhập tên tag mới (Ví dụ: Bắn súng, Chiến thuật...)" required style="flex: 1; padding: 9px 12px; font-size: 0.9rem;" />
+                <button type="submit" class="btn-primary" style="padding: 9px 16px; font-size: 0.88rem; white-space: nowrap; font-weight: 600;">+ Thêm Tag</button>
+            </form>
+
+            <label style="font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Các thể loại hiện có trong hệ thống:</label>
+            <div id="admin-tags-list" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 220px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px;">
+                <span style="color: var(--muted); font-size: 0.85rem;">Đang tải danh sách thể loại...</span>
+            </div>
+
+            <div style="margin-top: 1.2rem; text-align: right;">
+                <button type="button" class="btn-ghost" onclick="closeModal('admin-tag-modal')" style="padding: 8px 16px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Toast -->
     <div id="toast-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; font-size: 1.1rem; pointer-events: none; opacity: 0; transition: opacity 0.3s;"></div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20261013"></script>
     <script>
         // Khởi tạo riêng cho trang admin.html
         document.addEventListener('DOMContentLoaded', async () => {
