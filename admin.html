@@ -196,6 +196,11 @@
                             </div>
                         </div>
                         <div style="margin-bottom: 1.2rem;">
+                            <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Link tải game (Google Drive):</label>
+                            <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);" />
+                            <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:3px;">Link Google Drive chứa bộ cài game dành cho khách sau khi mua.</small>
+                        </div>
+                        <div style="margin-bottom: 1.2rem;">
                             <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Mô tả chi tiết:</label>
                             <textarea id="ag-desc" rows="3" placeholder="Nhập mô tả về cốt truyện, lối chơi của game..." style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);"></textarea>
                         </div>
@@ -217,11 +222,12 @@
                                 <th>Thể loại</th>
                                 <th>Giá</th>
                                 <th>Đánh giá</th>
+                                <th>Link tải (Drive)</th>
                                 <th style="width: 130px; text-align: center;">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="admin-games-body">
-                            <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">Đang tải danh sách game...</td></tr>
+                            <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">Đang tải danh sách game...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -316,6 +322,34 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal Tải Game (Google Drive) -->
+    <div class="modal hidden" id="download-game-modal">
+        <div class="modal-content" style="max-width: 520px; text-align: center; position: relative;">
+            <span class="close" data-close="download-game-modal">&times;</span>
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🎮</div>
+            <h3 id="dgm-title" class="gradient-text" style="margin-bottom: 6px; font-size: 1.35rem;">Tải Game Về Máy</h3>
+            <p style="color: var(--muted); font-size: 0.86rem; margin-bottom: 1.2rem; line-height: 1.5;">
+                Game đã sẵn sàng trong kho lưu trữ Google Drive tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
+            </p>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 1.2rem; text-align: left;">
+                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải Google Drive:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="dgm-link-input" readonly style="flex: 1; font-family: monospace; font-size: 0.82rem; padding: 9px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #60a5fa;" />
+                    <button type="button" id="dgm-copy-btn" class="btn-ghost" style="padding: 9px 12px; font-size: 0.82rem; white-space: nowrap;">📋 Sao chép</button>
+                </div>
+                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link kho Google Drive mẫu.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a id="dgm-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex: 1; padding: 10px 18px; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+                    🚀 Mở Google Drive Tải Ngay
+                </a>
+                <button type="button" class="btn-ghost" onclick="closeModal('download-game-modal')" style="padding: 10px 16px;">Đóng</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Notification Toast -->
     <div id="toast-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; font-size: 1.1rem; pointer-events: none; opacity: 0; transition: opacity 0.3s;"></div>

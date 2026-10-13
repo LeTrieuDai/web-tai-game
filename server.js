@@ -76,6 +76,7 @@ const gameSchema = new mongoose.Schema({
     desc: { type: String, default: '' },
     publisher: { type: String, default: '' },
     release: { type: String, default: '' },
+    downloadUrl: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 const Game = mongoose.model('Game', gameSchema);
@@ -160,9 +161,28 @@ async function seedData() {
         for (const game of allGames) {
             const exists = await Game.findOne({ slug: game.slug });
             if (!exists) {
+                if (!game.downloadUrl) {
+                    game.downloadUrl = `https://drive.google.com/drive/folders/game_${game.slug}`;
+                }
                 await Game.create(game);
                 added++;
             }
+        }
+
+        // Cập nhật link tải Google Drive mặc định cho các game cũ chưa có
+        const gamesWithoutLink = await Game.find({
+            $or: [
+                { downloadUrl: { $exists: false } },
+                { downloadUrl: '' },
+                { downloadUrl: null }
+            ]
+        });
+        if (gamesWithoutLink.length > 0) {
+            for (const g of gamesWithoutLink) {
+                g.downloadUrl = `https://drive.google.com/drive/folders/game_${g.slug}`;
+                await g.save();
+            }
+            console.log(`📁 Đã thiết lập link tải Google Drive mặc định cho ${gamesWithoutLink.length} game.`);
         }
         const reviewCount = await Review.countDocuments();
         if (reviewCount === 0) {
@@ -621,7 +641,7 @@ app.get('/api/admin/stats', async (req, res) => {
 // Admin: Thêm game mới
 app.post('/api/admin/games', async (req, res) => {
     try {
-        const { name, slug, img, tags, price, desc, publisher, release } = req.body;
+        const { name, slug, img, tags, price, desc, publisher, release, downloadUrl } = req.body;
         if (!name || !slug) return res.status(400).json({ error: 'Thiếu tên hoặc slug của game' });
         const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
         const exists = await Game.findOne({ slug: cleanSlug });
@@ -635,7 +655,8 @@ app.post('/api/admin/games', async (req, res) => {
             price: Number(price) || 1000,
             desc: desc || 'Mô tả game đang được cập nhật.',
             publisher: publisher || 'GameStore Studio',
-            release: release || new Date().toLocaleDateString('vi-VN')
+            release: release || new Date().toLocaleDateString('vi-VN'),
+            downloadUrl: (downloadUrl && downloadUrl.trim()) ? downloadUrl.trim() : `https://drive.google.com/drive/folders/game_${cleanSlug}`
         });
 
         // Tự động tạo file HTML chi tiết cho game nếu chưa có
@@ -662,7 +683,7 @@ app.post('/api/admin/games', async (req, res) => {
 app.put('/api/admin/games/:slug', async (req, res) => {
     try {
         const { slug } = req.params;
-        const { name, img, tags, price, desc, publisher, release } = req.body;
+        const { name, img, tags, price, desc, publisher, release, downloadUrl } = req.body;
         const game = await Game.findOne({ slug });
         if (!game) return res.status(404).json({ error: 'Không tìm thấy game' });
 
@@ -673,6 +694,7 @@ app.put('/api/admin/games/:slug', async (req, res) => {
         if (desc) game.desc = desc;
         if (publisher) game.publisher = publisher;
         if (release) game.release = release;
+        if (downloadUrl !== undefined) game.downloadUrl = downloadUrl.trim();
 
         await game.save();
         res.json(game);

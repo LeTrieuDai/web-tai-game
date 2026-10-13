@@ -1111,15 +1111,118 @@ function logout() {
 }
 
 /**
+ * Đảm bảo modal tải game Google Drive tồn tại trên trang
+ */
+function ensureDownloadModalExists() {
+  if (document.getElementById('download-game-modal')) return;
+  const modalHTML = `
+    <div class="modal hidden" id="download-game-modal">
+        <div class="modal-content" style="max-width: 520px; text-align: center; position: relative;">
+            <span class="close" data-close="download-game-modal">&times;</span>
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🎮</div>
+            <h3 id="dgm-title" class="gradient-text" style="margin-bottom: 6px; font-size: 1.35rem;">Tải Game Về Máy</h3>
+            <p style="color: var(--muted); font-size: 0.86rem; margin-bottom: 1.2rem; line-height: 1.5;">
+                Game đã sẵn sàng trong kho lưu trữ Google Drive tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
+            </p>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 1.2rem; text-align: left;">
+                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải Google Drive:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="dgm-link-input" readonly style="flex: 1; font-family: monospace; font-size: 0.82rem; padding: 9px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #60a5fa;" />
+                    <button type="button" id="dgm-copy-btn" class="btn-ghost" style="padding: 9px 12px; font-size: 0.82rem; white-space: nowrap;">📋 Sao chép</button>
+                </div>
+                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link kho Google Drive mẫu.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a id="dgm-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex: 1; padding: 10px 18px; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+                    🚀 Mở Google Drive Tải Ngay
+                </a>
+                <button type="button" class="btn-ghost" onclick="closeModal('download-game-modal')" style="padding: 10px 16px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+/**
+ * Hiển thị modal chứa đường link tải game (Google Drive) sau khi người chơi đã mua game
+ */
+async function showDownloadGameModal(gameOrSlug) {
+  let game = gameOrSlug;
+  if (typeof gameOrSlug === 'string') {
+    if (allGamesCache && allGamesCache.length > 0) {
+      game = allGamesCache.find(g => g.slug === gameOrSlug || (g.name || '').toLowerCase() === gameOrSlug.toLowerCase());
+    }
+    if (!game) {
+      try {
+        const res = await fetch(`${API_URL}/games`);
+        if (res.ok) {
+          const list = await res.json();
+          allGamesCache = list;
+          game = list.find(g => g.slug === gameOrSlug || (g.name || '').toLowerCase() === gameOrSlug.toLowerCase());
+        }
+      } catch (e) {}
+    }
+  }
+
+  ensureDownloadModalExists();
+
+  const titleEl = document.getElementById('dgm-title');
+  const inputEl = document.getElementById('dgm-link-input');
+  const openBtn = document.getElementById('dgm-open-btn');
+  const noteEl = document.getElementById('dgm-note');
+
+  const gameTitle = game ? (game.name || 'Game') : 'Game';
+  const rawUrl = game ? (game.downloadUrl || '') : '';
+  const finalUrl = (rawUrl && rawUrl.trim()) ? rawUrl.trim() : (game && game.slug ? `https://drive.google.com/drive/folders/game_${game.slug}` : 'https://drive.google.com');
+
+  if (titleEl) titleEl.textContent = `Tải Game: ${gameTitle}`;
+  if (inputEl) inputEl.value = finalUrl;
+  if (openBtn) {
+    openBtn.href = finalUrl;
+    openBtn.setAttribute('target', '_blank');
+  }
+  if (noteEl) {
+    noteEl.style.display = (!rawUrl || !rawUrl.trim()) ? 'block' : 'none';
+  }
+
+  openModal('download-game-modal');
+}
+
+/**
  * Hàm tải game dùng cho các trang giới thiệu chi tiết
  */
-function downloadGame(gameName) {
+async function downloadGame(gameName) {
   const currentUser = storage.get('currentUser', null);
-  if (currentUser) {
-    alert(`Đang bắt đầu tải game: ${gameName}...`);
-  } else {
-    alert('Vui lòng đăng nhập để có quyền tải game!');
+  if (!currentUser) {
+    openModal('login-modal');
+    if (typeof showToast === 'function') showToast('Vui lòng đăng nhập để có quyền tải game!');
+    else alert('Vui lòng đăng nhập để có quyền tải game!');
+    return;
   }
+
+  let game = (allGamesCache || []).find(g => (g.name || '').toLowerCase() === (gameName || '').toLowerCase() || g.slug === gameName);
+  if (!game) {
+    try {
+      const res = await fetch(`${API_URL}/games`);
+      if (res.ok) {
+        const list = await res.json();
+        allGamesCache = list;
+        game = list.find(g => (g.name || '').toLowerCase() === (gameName || '').toLowerCase() || g.slug === gameName);
+      }
+    } catch (e) {}
+  }
+
+  const slug = game ? game.slug : '';
+  const isPurchased = (currentUser.purchased || []).includes(slug) || currentUser.role === 'admin';
+  if (!isPurchased) {
+    alert('Bạn chưa sở hữu tựa game này! Vui lòng thêm vào giỏ hàng và thanh toán để nhận link tải Google Drive.');
+    return;
+  }
+
+  showDownloadGameModal(game || { name: gameName, slug });
 }
 
 /**
@@ -1343,11 +1446,11 @@ async function renderGameDetailTags() {
         oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 
         if (currentUser && currentUser.role === 'admin') {
-            newBtn.textContent = 'Tải game';
-            newBtn.onclick = () => alert('Đang tải game...');
+            newBtn.textContent = '📥 Tải game (Google Drive)';
+            newBtn.onclick = () => showDownloadGameModal(game);
         } else if (currentUser && currentUser.purchased && currentUser.purchased.includes(slug)) {
-            newBtn.textContent = 'Tải game';
-            newBtn.onclick = () => alert('Đang tải game...');
+            newBtn.textContent = '📥 Tải game (Google Drive)';
+            newBtn.onclick = () => showDownloadGameModal(game);
         } else {
             newBtn.textContent = '1.000đ';
             newBtn.onclick = async () => {
@@ -1565,6 +1668,7 @@ function escapeHtml(str) {
 }
 
 function ensureModalsExist() {
+  ensureDownloadModalExists();
   // Neu dang o trang admin.html chuyen dung thi tuyet doi khong chen modal trung lap
   if (document.getElementById('admin-main-content')) {
     return;
@@ -1749,6 +1853,11 @@ function ensureModalsExist() {
                     <input type="text" id="ag-publisher" placeholder="FromSoftware" />
                   </div>
                 </div>
+                <div style="margin-bottom: 0.8rem;">
+                  <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px;">Link tải game (Google Drive):</label>
+                  <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%;" />
+                  <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:3px;">Link Google Drive chứa bộ cài game dành cho khách sau khi mua.</small>
+                </div>
                 <div>
                   <label style="font-size:0.85rem; color:var(--muted);">Mô tả ngắn về game:</label>
                   <textarea id="ag-desc" rows="3" class="custom-textarea" placeholder="Giới thiệu nội dung, lối chơi..."></textarea>
@@ -1769,11 +1878,12 @@ function ensureModalsExist() {
                     <th>Thể loại</th>
                     <th>Giá</th>
                     <th>Đánh giá</th>
+                    <th>Link tải (Drive)</th>
                     <th>Hành động</th>
                   </tr>
                 </thead>
                 <tbody id="admin-games-body">
-                  <tr><td colspan="7" style="text-align: center; color: var(--muted);">Đang tải danh sách game...</td></tr>
+                  <tr><td colspan="8" style="text-align: center; color: var(--muted);">Đang tải danh sách game...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1951,13 +2061,22 @@ function setupProfileModal() {
                 <img src="${g.img}" alt="${g.name}" />
                 <div class="library-card-body">
                   <div class="library-card-title" title="${g.name}">${escapeHtml(g.name)}</div>
-                  <div style="display:flex; gap:6px;">
-                    <button type="button" class="btn-primary" style="padding:4px 8px; font-size:0.75rem; flex:1;" onclick="window.location.href='${g.slug}.html'">Chơi ngay 🚀</button>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="btn-primary profile-download-btn" data-slug="${g.slug}" style="padding:4px 8px; font-size:0.75rem; flex:1;">📥 Tải game</button>
+                    <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:0.75rem;" onclick="window.location.href='${g.slug}.html'">Chi tiết</button>
                     <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:0.75rem;" onclick="window.location.href='${g.slug}.html#game-reviews-wrapper'">⭐ Đánh giá</button>
                   </div>
                 </div>
               </div>
             `).join('');
+
+            grid.querySelectorAll('.profile-download-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const slug = btn.dataset.slug;
+                const g = (data.purchasedGames || []).find(x => x.slug === slug);
+                if (g) showDownloadGameModal(g);
+              });
+            });
           }
         }
 
@@ -2168,6 +2287,9 @@ function setupAdminDashboard() {
         <td style="color:#facc15; font-weight:700;">${(g.price || 1000).toLocaleString('vi-VN')}đ</td>
         <td>⭐ ${g.ratingAvg || 5.0}</td>
         <td>
+          ${g.downloadUrl ? `<a href="${escapeHtml(g.downloadUrl)}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa; text-decoration:none; font-size:0.75rem; background:rgba(59,130,246,0.15); padding:3px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:3px;" title="${escapeHtml(g.downloadUrl)}">📁 Link Drive</a>` : '<span style="color:var(--muted); font-size:0.75rem;">Chưa có</span>'}
+        </td>
+        <td>
           <button type="button" class="btn-ghost edit-game-btn" data-slug="${g.slug}" style="padding:3px 8px; font-size:0.75rem; margin-right:4px;">✏️ Sửa</button>
           <button type="button" class="btn-ghost delete-game-btn" data-slug="${g.slug}" style="padding:3px 8px; font-size:0.75rem; color:#f87171; border-color:rgba(239,68,68,0.3);">🗑️ Xóa</button>
         </td>
@@ -2329,11 +2451,15 @@ function setupAdminDashboard() {
       document.getElementById('ag-price').value = game.price || 1000;
       document.getElementById('ag-tags').value = (game.tags || []).join(', ');
       document.getElementById('ag-publisher').value = game.publisher || '';
+      const dlInput = document.getElementById('ag-download-url');
+      if (dlInput) dlInput.value = game.downloadUrl || '';
       document.getElementById('ag-desc').value = game.desc || '';
     } else {
       title.textContent = 'Thêm Game Mới';
       document.getElementById('admin-game-form').reset();
       slugInput.disabled = false;
+      const dlInput = document.getElementById('ag-download-url');
+      if (dlInput) dlInput.value = '';
     }
     formBox.scrollIntoView({ behavior: 'smooth' });
   }
@@ -2385,6 +2511,36 @@ function setupAdminDashboard() {
         if (reasonInput) reasonInput.value = 'Admin xóa sạch số dư';
       }
     }
+
+    // Sao chép link tải Google Drive
+    const copyDlBtn = e.target.closest('#dgm-copy-btn');
+    if (copyDlBtn) {
+      const input = document.getElementById('dgm-link-input');
+      if (input && input.value) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(input.value).then(() => {
+            if (typeof showToast === 'function') showToast('Đã sao chép link Google Drive!');
+            else alert('Đã sao chép link Google Drive!');
+          }).catch(() => {
+            input.select();
+            document.execCommand('copy');
+            if (typeof showToast === 'function') showToast('Đã sao chép link Google Drive!');
+            else alert('Đã sao chép link Google Drive!');
+          });
+        } else {
+          input.select();
+          document.execCommand('copy');
+          if (typeof showToast === 'function') showToast('Đã sao chép link Google Drive!');
+          else alert('Đã sao chép link Google Drive!');
+        }
+      }
+    }
+
+    // Đóng modal tải game
+    const closeDlBtn = e.target.closest('[data-close="download-game-modal"]');
+    if (closeDlBtn) {
+      closeModal('download-game-modal');
+    }
   });
 
   // Tìm kiếm khách hàng
@@ -2407,9 +2563,10 @@ function setupAdminDashboard() {
       const price = document.getElementById('ag-price').value;
       const tags = document.getElementById('ag-tags').value;
       const publisher = document.getElementById('ag-publisher').value;
+      const downloadUrl = (document.getElementById('ag-download-url')?.value || '').trim();
       const desc = document.getElementById('ag-desc').value;
 
-      const bodyData = { name, slug, img, price, tags, publisher, desc };
+      const bodyData = { name, slug, img, price, tags, publisher, desc, downloadUrl };
 
       try {
         const url = isEdit ? `${API_URL}/admin/games/${slug}` : `${API_URL}/admin/games`;
