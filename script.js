@@ -580,61 +580,13 @@ async function renderTagsDropdown() {
     container.innerHTML = '';
     tags.forEach(tag => {
       const item = document.createElement('div');
-      item.className = 'tag-item-wrapper';
-      item.style.display = 'flex';
-      item.style.justifyContent = 'space-between';
-      item.style.alignItems = 'center';
-
-      const span = document.createElement('span');
-      span.textContent = tag;
-      span.style.flex = '1';
-      span.style.padding = '0.3rem 0';
-      span.style.cursor = 'pointer';
-      span.addEventListener('click', () => filterGamesByTag(tag));
-      item.appendChild(span);
-
-      const currentUser = storage.get('currentUser', null);
-      if (currentUser && currentUser.role === 'admin') {
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '×';
-        delBtn.style.background = 'none';
-        delBtn.style.border = 'none';
-        delBtn.style.color = 'red';
-        delBtn.style.cursor = 'pointer';
-        delBtn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          if (confirm(`Xóa tag "${tag}" khỏi hệ thống?`)) {
-            await fetch(`${API_URL}/tags/${encodeURIComponent(tag)}`, { method: 'DELETE' });
-            renderTagsDropdown();
-          }
-        });
-        item.appendChild(delBtn);
-      }
+      item.className = 'dropdown-item';
+      item.textContent = tag;
+      item.style.padding = '0.45rem 1rem';
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', () => filterGamesByTag(tag));
       container.appendChild(item);
     });
-
-    const currentUser = storage.get('currentUser', null);
-    if (currentUser && currentUser.role === 'admin') {
-      const addBtn = document.createElement('div');
-      addBtn.textContent = '+ Thêm tag hệ thống';
-      addBtn.style.padding = '0.5rem';
-      addBtn.style.color = 'var(--primary)';
-      addBtn.style.cursor = 'pointer';
-      addBtn.style.fontWeight = 'bold';
-      addBtn.style.borderTop = '1px solid rgba(0,0,0,0.1)';
-      addBtn.addEventListener('click', async () => {
-        const newTag = prompt('Nhập tên tag mới:');
-        if (newTag && newTag.trim()) {
-          await fetch(`${API_URL}/tags`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newTag.trim() })
-          });
-          renderTagsDropdown();
-        }
-      });
-      container.appendChild(addBtn);
-    }
   } catch (error) {
     console.error("Lỗi lấy tags:", error);
   }
@@ -1358,63 +1310,7 @@ async function renderGameDetailTags() {
       bannerImg.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)'; // Thêm chút bóng cho đẹp
     }
 
-    const currentUser = storage.get('currentUser', null);
-
-    if (currentUser && currentUser.role === 'admin' && addBtn) {
-      addBtn.style.display = 'inline-block';
-      addBtn.onclick = async (e) => {
-        e.stopPropagation();
-        
-        const tagsResponse = await fetch(`${API_URL}/tags`);
-        const allTags = await tagsResponse.json();
-        const availableTags = allTags.filter(t => !game.tags.includes(t));
-
-        if (availableTags.length === 0) {
-          alert('Không còn tag nào khả dụng!');
-          return;
-        }
-
-        let menu = document.getElementById('tag-selection-menu');
-        if (menu) menu.remove();
-
-        menu = document.createElement('div');
-        menu.id = 'tag-selection-menu';
-        menu.className = 'custom-dropdown-menu';
-
-        availableTags.forEach(tag => {
-          const item = document.createElement('div');
-          item.className = 'dropdown-item';
-          item.textContent = tag;
-          item.onclick = async () => {
-            await fetch(`${API_URL}/games/${slug}/tags`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ tag })
-            });
-            renderGameDetailTags();
-            menu.remove();
-          };
-          menu.appendChild(item);
-        });
-
-        document.body.appendChild(menu);
-
-        const rect = addBtn.getBoundingClientRect();
-        menu.style.top = `${rect.bottom + window.scrollY + 5}px`;
-        menu.style.left = `${rect.left + window.scrollX - 100}px`;
-
-        const closeMenu = (ev) => {
-          if (!menu.contains(ev.target) && ev.target !== addBtn) {
-            menu.remove();
-            document.removeEventListener('click', closeMenu);
-          }
-        };
-        document.addEventListener('click', closeMenu);
-      };
-
-    } else if (addBtn) {
-      addBtn.style.display = 'none';
-    }
+    if (addBtn) addBtn.style.display = 'none';
 
     container.innerHTML = '';
     if (game.tags && game.tags.length > 0) {
@@ -1422,17 +1318,6 @@ async function renderGameDetailTags() {
         const span = document.createElement('span');
         span.className = 'tag-badge';
         span.textContent = tag;
-
-        if (currentUser && currentUser.role === 'admin') {
-          span.style.cursor = 'pointer';
-          span.title = 'Nhấp để xóa tag';
-          span.addEventListener('click', async () => {
-            if (confirm(`Xóa tag "${tag}" khỏi game này?`)) {
-              await fetch(`${API_URL}/games/${slug}/tags/${encodeURIComponent(tag)}`, { method: 'DELETE' });
-              renderGameDetailTags();
-            }
-          });
-        }
         container.appendChild(span);
       });
     } else {
@@ -1705,9 +1590,9 @@ function ensureAdminTagModalExists() {
 
 function ensureModalsExist() {
   ensureDownloadModalExists();
-  ensureAdminTagModalExists();
-  // Neu dang o trang admin.html chuyen dung thi tuyet doi khong chen modal trung lap
+  // Neu dang o trang admin.html chuyen dung thi tuyet doi khong chen modal khach hang trung lap
   if (document.getElementById('admin-main-content')) {
+    ensureAdminTagModalExists();
     return;
   }
 
@@ -1771,262 +1656,6 @@ function ensureModalsExist() {
     document.body.insertAdjacentHTML('beforeend', profileModalHTML);
   }
 
-  if (!document.getElementById('admin-modal')) {
-    const adminModalHTML = `
-      <div class="modal hidden" id="admin-modal">
-        <div class="modal-content modal-extra-large">
-          <span class="close" data-close="admin-modal">&times;</span>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
-            <div>
-              <h2 style="margin: 0;" class="gradient-text">⚙️ Bảng Quản Trị Hệ Thống</h2>
-              <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">Theo dõi doanh thu, tài khoản và quản lý kho game GameStore</p>
-            </div>
-            <button type="button" id="admin-refresh-btn" class="btn-ghost" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">🔄 Làm mới</button>
-          </div>
-          <div class="custom-tabs">
-            <button type="button" class="tab-btn active" data-tab="tab-admin-overview">📊 Thống kê & Doanh thu</button>
-            <button type="button" class="tab-btn" data-tab="tab-admin-games">🕹️ Quản lý Game (CRUD)</button>
-            <button type="button" class="tab-btn" data-tab="tab-admin-users">👥 Quản lý Khách hàng</button>
-          </div>
-          <div class="tab-pane active" id="tab-admin-overview">
-            <div class="kpi-grid">
-              <div class="kpi-card">
-                <span class="kpi-icon">💰</span>
-                <div class="kpi-info">
-                  <span class="kpi-label">Tổng doanh thu</span>
-                  <strong class="kpi-value" id="kpi-revenue" style="color: #4ade80;">0đ</strong>
-                </div>
-              </div>
-              <div class="kpi-card">
-                <span class="kpi-icon">👥</span>
-                <div class="kpi-info">
-                  <span class="kpi-label">Tổng người dùng</span>
-                  <strong class="kpi-value" id="kpi-users">0</strong>
-                </div>
-              </div>
-              <div class="kpi-card">
-                <span class="kpi-icon">🎮</span>
-                <div class="kpi-info">
-                  <span class="kpi-label">Tổng số game</span>
-                  <strong class="kpi-value" id="kpi-games">0</strong>
-                </div>
-              </div>
-              <div class="kpi-card">
-                <span class="kpi-icon">🛒</span>
-                <div class="kpi-info">
-                  <span class="kpi-label">Lượt mua game</span>
-                  <strong class="kpi-value" id="kpi-purchases">0</strong>
-                </div>
-              </div>
-            </div>
-            <div class="admin-charts-grid">
-              <div class="admin-chart-box">
-                <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem;">📈 Doanh thu nạp tiền 7 ngày gần nhất</h4>
-                <div style="height: 220px; position: relative;">
-                  <canvas id="admin-revenue-chart"></canvas>
-                </div>
-              </div>
-              <div class="admin-bestsellers-box">
-                <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem;">🔥 Top 5 Game bán chạy nhất</h4>
-                <div id="admin-bestsellers-list" class="bestsellers-list">
-                  <p style="color: var(--muted); text-align: center; padding: 2rem;">Đang tải danh sách...</p>
-                </div>
-              </div>
-            </div>
-            <h4 style="margin: 1.5rem 0 0.6rem; font-size: 0.95rem;">🕒 Giao dịch nạp tiền gần nhất</h4>
-            <div class="history-table-wrap">
-              <table class="custom-table" id="admin-recent-tx-table">
-                <thead>
-                  <tr>
-                    <th>Thời gian</th>
-                    <th>Tài khoản</th>
-                    <th>Số tiền</th>
-                    <th>Cổng / Mã</th>
-                    <th>Nội dung</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-recent-tx-body">
-                  <tr><td colspan="5" style="text-align: center; color: var(--muted);">Chưa có giao dịch</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="tab-pane" id="tab-admin-games">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <span style="color: var(--muted); font-size: 0.88rem;">Danh sách tất cả game trong cơ sở dữ liệu:</span>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <button type="button" class="btn-ghost" id="admin-add-tag-btn" style="padding: 0.5rem 1rem; font-size: 0.88rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.4); display: flex; align-items: center; gap: 6px; cursor: pointer;">🏷️ + Thêm tag game</button>
-                <button type="button" class="btn-primary" id="admin-add-game-btn" style="padding: 0.5rem 1.2rem; font-size: 0.88rem;">+ Thêm Game Mới</button>
-              </div>
-            </div>
-            <div id="admin-game-form-container" class="admin-form-box hidden">
-              <h3 id="admin-game-form-title" style="margin-bottom: 1rem; color: var(--primary);">Thêm Game Mới</h3>
-              <form id="admin-game-form">
-                <input type="hidden" id="ag-is-edit" value="0" />
-                <div class="form-grid-2">
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Tên Game:</label>
-                    <input type="text" id="ag-name" placeholder="Ví dụ: Elden Ring" required />
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Slug (Định danh URL):</label>
-                    <input type="text" id="ag-slug" placeholder="Ví dụ: elden_ring" required />
-                  </div>
-                </div>
-                <div class="form-grid-2">
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Link ảnh bìa (Steam / Direct URL):</label>
-                    <input type="url" id="ag-img" placeholder="https://cdn.akamai.steamstatic.com/..." required />
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Giá bán (VNĐ):</label>
-                    <input type="number" id="ag-price" value="1000" min="0" step="500" required />
-                  </div>
-                </div>
-                <div class="form-grid-2">
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted);">Nhà phát hành:</label>
-                    <input type="text" id="ag-publisher" placeholder="FromSoftware" />
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; color:#60a5fa; display: flex; align-items: center; gap: 5px; font-weight: 600;">
-                      📁 Link tải game (Google Drive):
-                    </label>
-                    <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; border-color: rgba(96, 165, 250, 0.4);" />
-                  </div>
-                </div>
-                <div style="margin-bottom: 0.8rem;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label style="font-size:0.85rem; color:var(--muted); font-weight: 600;">🏷️ Thể loại game (Nhấp dấu + để chọn):</label>
-                    <button type="button" id="ag-quick-add-tag-btn" class="btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); cursor: pointer;">+ Thêm tag mới vào hệ thống</button>
-                  </div>
-                  <div id="ag-tags-picker" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; min-height: 44px; align-items: center;">
-                    <!-- Dynamic chips generated via JS -->
-                  </div>
-                  <input type="hidden" id="ag-tags" value="" />
-                  <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:4px;">Nhấp vào tag có dấu <strong>+</strong> để gắn vào game, nhấp vào tag màu tím có dấu <strong>✓</strong> để bỏ chọn.</small>
-                </div>
-                <div>
-                  <label style="font-size:0.85rem; color:var(--muted);">Mô tả ngắn về game:</label>
-                  <textarea id="ag-desc" rows="3" class="custom-textarea" placeholder="Giới thiệu nội dung, lối chơi..."></textarea>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 1rem;">
-                  <button type="submit" class="btn-primary" style="flex: 1;">💾 Lưu thông tin Game</button>
-                  <button type="button" class="btn-ghost" id="ag-cancel-btn">Hủy bỏ</button>
-                </div>
-              </form>
-            </div>
-            <div class="history-table-wrap">
-              <table class="custom-table" id="admin-games-table">
-                <thead>
-                  <tr>
-                    <th>Ảnh</th>
-                    <th>Tên Game</th>
-                    <th>Slug</th>
-                    <th>Thể loại</th>
-                    <th>Giá</th>
-                    <th>Đánh giá</th>
-                    <th>Link tải (Drive)</th>
-                    <th>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-games-body">
-                  <tr><td colspan="8" style="text-align: center; color: var(--muted);">Đang tải danh sách game...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <!-- Tab 3: Quản lý Khách hàng -->
-          <div class="tab-pane" id="tab-admin-users">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 10px;">
-              <div>
-                <span style="color: var(--muted); font-size: 0.9rem;">Danh sách tài khoản khách hàng, vai trò và quản lý số dư:</span>
-              </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <input type="text" id="admin-user-search-input" placeholder="🔍 Tìm tên khách hàng..." style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);" />
-              </div>
-            </div>
-
-            <!-- Form Hộp thoại Điều chỉnh Số dư (Ẩn mặc định) -->
-            <div id="admin-adjust-money-container" class="admin-form-box hidden" style="margin-bottom: 2rem; border-left: 4px solid var(--primary);">
-              <h3 style="margin-bottom: 0.6rem; color: var(--primary);">💵 Điều Chỉnh Số Dư Khách Hàng</h3>
-              <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.2rem;">
-                Tài khoản: <strong id="adj-target-username" style="color: #60a5fa; font-size: 1.05rem;"></strong>
-                · Số dư hiện tại: <strong id="adj-target-money" style="color: #facc15; font-size: 1.05rem;">0đ</strong>
-              </p>
-
-              <form id="admin-adjust-money-form">
-                <input type="hidden" id="adj-username-input" />
-                
-                <div style="margin-bottom: 1.2rem;">
-                  <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 6px; font-weight: 600;">1. Chọn hình thức điều chỉnh:</label>
-                  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
-                      <input type="radio" name="adj-action" value="add" checked /> 🟢 <strong>Cộng thêm tiền</strong>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
-                      <input type="radio" name="adj-action" value="subtract" /> 🔴 <strong>Trừ bớt tiền</strong>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem;">
-                      <input type="radio" name="adj-action" value="set" /> 🟡 <strong>Đặt lại số dư cụ thể</strong>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Mệnh giá nhanh -->
-                <div style="margin-bottom: 1.2rem;">
-                  <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 6px; font-weight: 600;">2. Chọn nhanh mệnh giá:</label>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="10000" style="padding: 5px 12px; font-size: 0.82rem;">+10.000đ</button>
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="20000" style="padding: 5px 12px; font-size: 0.82rem;">+20.000đ</button>
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="50000" style="padding: 5px 12px; font-size: 0.82rem;">+50.000đ</button>
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="100000" style="padding: 5px 12px; font-size: 0.82rem;">+100.000đ</button>
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="500000" style="padding: 5px 12px; font-size: 0.82rem;">+500.000đ</button>
-                    <button type="button" class="btn-ghost adj-preset-btn" data-val="0" style="padding: 5px 12px; font-size: 0.82rem; color: #f87171; border-color: rgba(239,68,68,0.4);">❌ Đặt về 0đ (Xóa sạch)</button>
-                  </div>
-                </div>
-
-                <div class="form-grid-2">
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px; font-weight: 600;">3. Số tiền (VNĐ):</label>
-                    <input type="number" id="adj-amount-input" value="50000" min="0" step="1000" required style="font-size: 1.05rem; font-weight: 700; color: #facc15;" />
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; color:var(--muted); display: block; margin-bottom: 4px; font-weight: 600;">4. Lý do / Ghi chú giao dịch:</label>
-                    <input type="text" id="adj-reason-input" placeholder="Ví dụ: Admin nạp bù / Thưởng sự kiện / Hoàn tiền" />
-                  </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 1.2rem;">
-                  <button type="submit" class="btn-primary" style="padding: 0.6rem 1.6rem;">💾 Xác Nhận Cập Nhật</button>
-                  <button type="button" class="btn-ghost" id="adj-cancel-btn">Hủy bỏ</button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Bảng danh sách khách hàng -->
-            <div class="history-table-wrap">
-              <table class="custom-table" id="admin-users-table">
-                <thead>
-                  <tr>
-                    <th>Tài khoản</th>
-                    <th>Vai trò</th>
-                    <th>Số dư</th>
-                    <th>Game đã mua</th>
-                    <th>Giỏ hàng</th>
-                    <th style="width: 230px; text-align: center;">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-users-body">
-                  <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">Đang tải danh sách khách hàng...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    document.body.insertAdjacentHTML('beforeend', adminModalHTML);
-  }
 }
 
 function setupTabs() {
@@ -2606,18 +2235,8 @@ function setupAdminDashboard() {
     formBox.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // Delegated event listener cho các nút của Admin modal & trang Admin
+  // Delegated event listener cho các nút của trang Admin
   document.addEventListener('click', (e) => {
-    const openBtn = e.target.closest('#open-admin-btn');
-    if (openBtn) {
-      const modal = document.getElementById('admin-modal');
-      if (modal) {
-        e.preventDefault();
-        openModal('admin-modal');
-        loadAdminData();
-      }
-    }
-
     const refreshBtn = e.target.closest('#admin-refresh-btn, #admin-page-refresh-btn');
     if (refreshBtn) {
       loadAdminData();
