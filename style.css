@@ -2184,10 +2184,7 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
 
 /* Light Theme Overrides cho tính năng mới */
 [data-theme="light"] .game-count-badge,
-[data-theme="light"] .wishlist-filter-btn,
 [data-theme="light"] .sort-select,
-[data-theme="light"] .filter-chip,
-[data-theme="light"] .page-btn,
 [data-theme="light"] .kpi-card,
 [data-theme="light"] .admin-chart-box,
 [data-theme="light"] .admin-bestsellers-box,
@@ -2197,6 +2194,73 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
 [data-theme="light"] .library-card {
   background: #ffffff;
   border-color: var(--border-strong);
+  color: var(--text);
+}
+
+[data-theme="light"] .filter-sidebar-card {
+  box-shadow: 0 8px 24px -10px hsla(232, 30%, 20%, 0.15);
+}
+
+/* Fix lỗi phông chữ màu trắng trên nền sáng cho thẻ tag filter */
+[data-theme="light"] .filter-chip {
+  background: #f1f3f9;
+  border: 1px solid var(--border-strong);
+  color: hsl(232, 25%, 28%);
+}
+
+[data-theme="light"] .filter-chip:hover {
+  background: #ffffff;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Khi active ở nền sáng: đổi sang nền tím nhạt cao cấp và chữ tím đậm sắc nét (không còn bị màu trắng) */
+[data-theme="light"] .filter-chip.active {
+  background: hsla(265, 85%, 60%, 0.16) !important;
+  border: 1.5px solid var(--primary) !important;
+  color: hsl(265, 85%, 38%) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px -2px hsla(265, 85%, 60%, 0.28) !important;
+}
+
+/* Fix nút phân trang trong nền sáng */
+[data-theme="light"] .page-btn {
+  background: #ffffff;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+[data-theme="light"] .page-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: hsl(265, 80%, 97%);
+}
+
+[data-theme="light"] .page-btn.active {
+  background: hsla(265, 85%, 60%, 0.16) !important;
+  border: 1.5px solid var(--primary) !important;
+  color: hsl(265, 85%, 38%) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px -2px hsla(265, 85%, 60%, 0.25) !important;
+}
+
+/* Fix nút yêu thích (Wishlist) khi active trong nền sáng */
+[data-theme="light"] .wishlist-filter-btn {
+  background: #ffffff;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+[data-theme="light"] .wishlist-filter-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+[data-theme="light"] .wishlist-filter-btn.active {
+  background: hsla(350, 85%, 60%, 0.12) !important;
+  border: 1.5px solid #ef4444 !important;
+  color: #dc2626 !important;
+  font-weight: 700 !important;
 }
 
 [data-theme="light"] .custom-table th {
