@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname)); // Giúp truy cập thẳng được file index.html qua cổng 3000
 
 // 1. KẾT NỐI DATABASE
@@ -384,7 +385,14 @@ app.post('/api/user/theme', async (req, res) => {
 app.post('/api/sepay-webhook', async (req, res) => {
     try {
         console.log('🔔 [SePay Webhook Received]:', req.body);
-        const data = req.body;
+        const data = req.body || {};
+
+        // Xử lý gói test thử nghiệm của SePay (nút Gửi thử trên my.sepay.vn)
+        const content = (data.content || '').toUpperCase();
+        if (data.code === 'SEPAYTEST' || content.includes('SEPAY TEST') || (data.description && data.description.includes('SePay test'))) {
+            console.log('✅ [SePay Test Webhook]: Kiểm tra kết nối Webhook thành công!');
+            return res.json({ success: true, message: 'Kết nối SePay Webhook thành công!' });
+        }
 
         // Bỏ qua nếu không phải tiền vào (transferType !== 'in')
         if (data.transferType && data.transferType !== 'in') {
@@ -393,11 +401,9 @@ app.post('/api/sepay-webhook', async (req, res) => {
 
         const amount = Number(data.transferAmount || 0);
         if (amount <= 0) {
-            return res.json({ success: true, message: 'Số tiền không hợp lệ' });
+            return res.json({ success: true, message: 'Bỏ qua giao dịch số tiền <= 0' });
         }
 
-        // Nội dung chuyển khoản (content)
-        const content = (data.content || '').toUpperCase();
         console.log(`🔎 Phân tích nội dung chuyển khoản: "${content}", Số tiền: ${amount}đ`);
 
         // Tìm username trong nội dung: Cú pháp quy ước NAP <username> (ví dụ: NAP ADMIN hoặc NAP USER1)
@@ -429,17 +435,17 @@ app.post('/api/sepay-webhook', async (req, res) => {
 
             // Lưu log lịch sử giao dịch
             await Transaction.create({
-                gateway: data.gateway,
-                transactionDate: data.transactionDate,
-                accountNumber: data.accountNumber,
-                code: data.code,
-                content: data.content,
-                transferType: data.transferType,
+                gateway: data.gateway || 'SePay',
+                transactionDate: data.transactionDate || new Date().toISOString(),
+                accountNumber: data.accountNumber || '',
+                code: data.code || '',
+                content: data.content || '',
+                transferType: data.transferType || 'in',
                 transferAmount: amount,
-                accumulated: data.accumulated,
-                subAccount: data.subAccount,
-                referenceCode: data.referenceCode,
-                description: data.description,
+                accumulated: data.accumulated || 0,
+                subAccount: data.subAccount || '',
+                referenceCode: data.referenceCode || '',
+                description: data.description || '',
                 username: matchedUser.username
             });
 
@@ -447,11 +453,11 @@ app.post('/api/sepay-webhook', async (req, res) => {
             return res.json({ success: true, message: `Đã cộng ${amount}đ cho user ${matchedUser.username}` });
         } else {
             console.log(`⚠️ Không tìm thấy user nào khớp với nội dung: "${content}"`);
-            return res.json({ success: false, message: 'Không tìm thấy user tương ứng' });
+            return res.json({ success: true, message: 'Đã nhận webhook nhưng không tìm thấy user tương ứng' });
         }
     } catch (err) {
         console.error('❌ Lỗi xử lý SePay Webhook:', err);
-        return res.status(500).json({ error: 'Lỗi máy chủ khi xử lý webhook' });
+        return res.status(200).json({ success: false, error: 'Đã nhận webhook nhưng có lỗi xảy ra' });
     }
 });
 
