@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Store</title>
-    <link rel="stylesheet" href="style.css?v=4" />
+    <link rel="stylesheet" href="style.css?v=5" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -290,28 +290,28 @@
     </div>
 
 
-    <!-- Modal Tải Game (Google Drive) -->
+    <!-- Modal Tải Game -->
     <div class="modal hidden" id="download-game-modal">
         <div class="modal-content" style="max-width: 520px; text-align: center; position: relative;">
             <span class="close" data-close="download-game-modal">&times;</span>
             <div style="font-size: 2.2rem; margin-bottom: 6px;">🎮</div>
             <h3 id="dgm-title" class="gradient-text" style="margin-bottom: 6px; font-size: 1.35rem;">Tải Game Về Máy</h3>
             <p style="color: var(--muted); font-size: 0.86rem; margin-bottom: 1.2rem; line-height: 1.5;">
-                Game đã sẵn sàng trong kho lưu trữ Google Drive tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
+                Game đã sẵn sàng trong kho lưu trữ tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
             </p>
 
             <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 1.2rem; text-align: left;">
-                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải Google Drive:</label>
+                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải game:</label>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <input type="text" id="dgm-link-input" readonly style="flex: 1; font-family: monospace; font-size: 0.82rem; padding: 9px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #60a5fa;" />
                     <button type="button" id="dgm-copy-btn" class="btn-ghost" style="padding: 9px 12px; font-size: 0.82rem; white-space: nowrap;">📋 Sao chép</button>
                 </div>
-                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link kho Google Drive mẫu.</p>
+                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link tải mẫu.</p>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <a id="dgm-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex: 1; padding: 10px 18px; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
-                    🚀 Mở Google Drive Tải Ngay
+                    🚀 Tải Game Ngay
                 </a>
                 <button type="button" class="btn-ghost" onclick="closeModal('download-game-modal')" style="padding: 10px 16px;">Đóng</button>
             </div>
@@ -347,7 +347,7 @@
         </form>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
 </body>
 
 </html>

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bảng Quản Trị Hệ Thống - GameStore</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=5" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -197,7 +197,7 @@
                             </div>
                             <div>
                                 <label style="font-size:0.85rem; color:#60a5fa; display: flex; align-items: center; gap: 5px; margin-bottom: 4px; font-weight: 600;">
-                                    📁 Link tải game (Google Drive):
+                                    📁 Link tải game:
                                 </label>
                                 <input type="url" id="ag-download-url" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid rgba(96, 165, 250, 0.4); color: var(--text);" />
                             </div>
@@ -208,7 +208,7 @@
                                 <button type="button" id="ag-quick-add-tag-btn" class="btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); cursor: pointer;">+ Thêm tag mới vào hệ thống</button>
                             </div>
                             <div id="ag-tags-picker" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; min-height: 44px; align-items: center;">
-                                <!-- Dynamic tag chips generated via script.js -->
+                                <!-- Dynamic tag chips generated via script.js?v=5 -->
                             </div>
                             <input type="hidden" id="ag-tags" value="" />
                             <small style="color:var(--muted); font-size:0.75rem; display:block; margin-top:4px;">Nhấp vào tag có dấu <strong>+</strong> để gắn vào game, nhấp vào tag màu tím có dấu <strong>✓</strong> để bỏ chọn.</small>
@@ -343,21 +343,21 @@
             <div style="font-size: 2.2rem; margin-bottom: 6px;">🎮</div>
             <h3 id="dgm-title" class="gradient-text" style="margin-bottom: 6px; font-size: 1.35rem;">Tải Game Về Máy</h3>
             <p style="color: var(--muted); font-size: 0.86rem; margin-bottom: 1.2rem; line-height: 1.5;">
-                Game đã sẵn sàng trong kho lưu trữ Google Drive tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
+                Game đã sẵn sàng trong kho lưu trữ tốc độ cao. Bạn có thể mở trực tiếp liên kết hoặc sao chép để tải bằng trình duyệt.
             </p>
 
             <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 1.2rem; text-align: left;">
-                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải Google Drive:</label>
+                <label style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Link tải game:</label>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <input type="text" id="dgm-link-input" readonly style="flex: 1; font-family: monospace; font-size: 0.82rem; padding: 9px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #60a5fa;" />
                     <button type="button" id="dgm-copy-btn" class="btn-ghost" style="padding: 9px 12px; font-size: 0.82rem; white-space: nowrap;">📋 Sao chép</button>
                 </div>
-                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link kho Google Drive mẫu.</p>
+                <p id="dgm-note" style="color: #facc15; font-size: 0.78rem; margin: 8px 0 0; display: none;">⚠️ Game chưa có link tải riêng, đang dùng link tải mẫu.</p>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <a id="dgm-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex: 1; padding: 10px 18px; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
-                    🚀 Mở Google Drive Tải Ngay
+                    🚀 Tải Game Ngay
                 </a>
                 <button type="button" class="btn-ghost" onclick="closeModal('download-game-modal')" style="padding: 10px 16px;">Đóng</button>
             </div>
@@ -396,7 +396,7 @@
     <!-- Notification Toast -->
     <div id="toast-notification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; font-size: 1.1rem; pointer-events: none; opacity: 0; transition: opacity 0.3s;"></div>
 
-    <script src="script.js?v=20261013_clean"></script>
+    <script src="script.js?v=5_clean"></script>
     <script>
         // Khởi tạo riêng cho trang admin.html
         document.addEventListener('DOMContentLoaded', async () => {
