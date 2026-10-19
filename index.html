@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Store</title>
-    <link rel="stylesheet" href="style.css?v=3" />
+    <link rel="stylesheet" href="style.css?v=4" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -91,30 +91,33 @@
                         <button type="button" class="clear-filter-btn hidden" id="clear-filter-btn" title="Xóa tất cả bộ lọc">✕ Bỏ lọc</button>
                     </div>
 
-                    <!-- 1. Sắp xếp -->
-                    <div class="filter-card-section">
-                        <label class="filter-card-label" for="game-sort-select">
-                            <span>⚡ Sắp xếp theo</span>
-                        </label>
-                        <div class="sort-select-wrap">
-                            <select id="game-sort-select" class="sort-select full-width">
-                                <option value="default">⚡ Sắp xếp: Mặc định</option>
-                                <option value="name_asc">🔤 Tên (A → Z)</option>
-                                <option value="name_desc">🔤 Tên (Z → A)</option>
-                                <option value="rating_desc">⭐ Đánh giá cao nhất</option>
-                                <option value="rating_count">🔥 Đánh giá nhiều nhất</option>
-                            </select>
+                    <!-- Nhóm điều khiển nhanh (Sắp xếp & Yêu thích) -->
+                    <div class="filter-quick-row">
+                        <!-- 1. Sắp xếp -->
+                        <div class="filter-card-section">
+                            <label class="filter-card-label" for="game-sort-select">
+                                <span>⚡ Sắp xếp theo</span>
+                            </label>
+                            <div class="sort-select-wrap">
+                                <select id="game-sort-select" class="sort-select full-width">
+                                    <option value="default">⚡ Sắp xếp: Mặc định</option>
+                                    <option value="name_asc">🔤 Tên (A → Z)</option>
+                                    <option value="name_desc">🔤 Tên (Z → A)</option>
+                                    <option value="rating_desc">⭐ Đánh giá cao nhất</option>
+                                    <option value="rating_count">🔥 Đánh giá nhiều nhất</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 2. Yêu thích -->
-                    <div class="filter-card-section">
-                        <label class="filter-card-label">
-                            <span>❤️ Bộ sưu tập</span>
-                        </label>
-                        <button type="button" class="wishlist-filter-btn full-width" id="wishlist-filter-btn" title="Xem danh sách yêu thích">
-                            <span>❤️</span> <span id="wishlist-btn-text">Yêu thích (0)</span>
-                        </button>
+                        <!-- 2. Yêu thích -->
+                        <div class="filter-card-section">
+                            <label class="filter-card-label">
+                                <span>❤️ Bộ sưu tập</span>
+                            </label>
+                            <button type="button" class="wishlist-filter-btn full-width" id="wishlist-filter-btn" title="Xem danh sách yêu thích">
+                                <span>❤️</span> <span id="wishlist-btn-text">Yêu thích (0)</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- 3. Thể loại game -->

@@ -1300,31 +1300,7 @@ body::before {
 .ai-chat-send:hover { transform: scale(1.08); }
 .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* ===================================================
-   RESPONSIVE
-   =================================================== */
-@media (max-width: 900px) {
-  .games-container {
-    grid-template-columns: repeat(2, 1fr); /* 2 game 1 hàng cho màn hình nhỏ hơn */
-  }
-  #main-header { padding: 0.8rem 1.2rem; }
-  .hero { margin: 1.5rem 1rem; padding: 3rem 1.8rem; }
-}
-
-@media (max-width: 600px) {
-  #main-header {
-    flex-wrap: wrap;
-  }
-  .header-left { gap: 1rem; }
-  .nav-links { margin-left: 0; }
-  .games-container {
-    grid-template-columns: 1fr; /* 1 game 1 hàng cho điện thoại */
-    padding: 1.2rem 1rem 2rem;
-  }
-  .section-header { padding: 0 1rem; }
-  .hero-stats { gap: 1.5rem; }
-  .search-input { width: 180px; }
-}
+/* Responsive styles are consolidated at the bottom of the layout section */
 
 /* ===================================================
    NÚT CHUYỂN SÁNG / TỐI
@@ -1461,12 +1437,12 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
 /* 1. LAYOUT 2 CỘT & BỘ LỌC STICKY BÊN PHẢI */
 .games-layout-wrapper {
   display: flex;
-  gap: 2rem;
+  gap: 2.2rem;
   max-width: 1350px;
-  margin: 2rem auto 3.5rem;
+  margin: 2.6rem auto 3.5rem;
   padding: 0 1.5rem;
   align-items: flex-start;
-  scroll-margin-top: 85px;
+  scroll-margin-top: 110px;
 }
 
 .games-main-column {
@@ -1493,7 +1469,7 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
   flex-shrink: 0;
   position: -webkit-sticky;
   position: sticky;
-  top: 85px;
+  top: 105px; /* Tăng khoảng cách cách xa Header khi cuộn trang (tạo khoảng hở 35px thoáng đãng) */
   align-self: flex-start;
   z-index: 25;
 }
@@ -1509,6 +1485,12 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
   flex-direction: column;
   gap: 1.2rem;
   transition: var(--transition);
+}
+
+.filter-quick-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .filter-card-header {
@@ -1674,28 +1656,247 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
   box-shadow: 0 4px 14px -4px hsla(265, 89%, 60%, 0.8);
 }
 
-/* Responsive cho Layout 2 cột và Bảng lọc Sticky */
+/* ===================================================
+   TỐI ƯU GIAO DIỆN RESPONSIVE MOBILE & TABLET
+   =================================================== */
+
+/* Tablet & Màn hình vừa (dưới 1150px) */
 @media (max-width: 1150px) {
   .games-main-column .games-container {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  #main-header {
+    padding: 0.8rem 1.5rem;
+  }
 }
 
+/* Màn hình dưới 900px: Bảng lọc đưa lên đầu, xếp 2 cột nút */
 @media (max-width: 900px) {
   .games-layout-wrapper {
     flex-direction: column;
     gap: 1.5rem;
+    margin: 1.8rem auto 3rem;
   }
   .filter-sidebar-sticky {
     width: 100%;
     position: static;
     order: -1;
   }
+  .filter-sidebar-card {
+    padding: 1.2rem;
+    border-radius: 16px;
+  }
+  .filter-quick-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .filter-chips-container {
+    max-height: 145px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .filter-chips-container::-webkit-scrollbar {
+    width: 4px;
+  }
+  .filter-chips-container::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
 }
 
+/* Màn hình Tablet nhỏ & Mobile lớn (dưới 768px) */
+@media (max-width: 768px) {
+  #main-header {
+    padding: 0.65rem 1rem !important;
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+  }
+  .header-left {
+    gap: 0.6rem !important;
+    flex-shrink: 0;
+  }
+  #main-header .logo {
+    font-size: 1.3rem;
+  }
+  #main-header .logo::before {
+    font-size: 1.15rem;
+  }
+  .games-nav {
+    display: none !important;
+  }
+  .search-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+  .search-input {
+    width: 130px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.82rem;
+  }
+  .nav-links {
+    gap: 0.4rem;
+  }
+  #main-header .nav-links > a {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+  }
+  #cart-container {
+    width: 36px !important;
+    height: 36px !important;
+    margin-right: 6px !important;
+  }
+  #cart-dropdown {
+    position: fixed !important;
+    top: 60px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+    border-radius: 16px !important;
+    z-index: 1002 !important;
+  }
+  .user-panel {
+    gap: 0.4rem;
+  }
+  .user-panel .avatar {
+    width: 34px;
+    height: 34px;
+  }
+  #open-deposit-btn {
+    padding: 0.25rem 0.6rem !important;
+    font-size: 0.78rem !important;
+  }
+  .user-dropdown {
+    right: 0 !important;
+    left: auto !important;
+    min-width: 200px;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 2.2rem 1.2rem 1.8rem;
+    margin: 0.8rem auto 1.4rem;
+    border-radius: 20px;
+  }
+  .hero-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    margin-bottom: 0.8rem;
+  }
+  .hero-title {
+    font-size: 1.85rem;
+    letter-spacing: -0.8px;
+    line-height: 1.22;
+    margin-bottom: 0.8rem;
+  }
+  .hero-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1.3rem;
+    line-height: 1.5;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.6rem;
+    margin-bottom: 1.6rem;
+  }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-ghost {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 0.75rem 1.2rem;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .hero-stats strong {
+    font-size: 1.15rem;
+  }
+  .hero-stats span {
+    font-size: 0.72rem;
+  }
+
+  /* Games Layout Wrapper */
+  .games-layout-wrapper {
+    padding: 0 1rem;
+    margin: 1.2rem auto 2.5rem;
+  }
+}
+
+/* Điện thoại di động (dưới 580px) */
 @media (max-width: 580px) {
   .games-main-column .games-container {
     grid-template-columns: 1fr !important;
+    gap: 1.1rem;
+  }
+  .game-card-img-wrap {
+    height: 185px;
+  }
+  .game-card-content {
+    padding: 12px 14px 14px;
+  }
+  .pagination-container {
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .page-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 0.84rem;
+  }
+  .modal-content {
+    width: 92% !important;
+    max-width: 390px !important;
+    padding: 1.5rem 1.2rem !important;
+    border-radius: 16px !important;
+  }
+  #ai-chat-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    font-size: 1.35rem;
+  }
+  #ai-chat-box {
+    bottom: 74px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    height: calc(100vh - 120px);
+    border-radius: 16px;
+  }
+}
+
+/* Điện thoại màn hình nhỏ (dưới 420px) */
+@media (max-width: 420px) {
+  #main-header {
+    padding: 0.5rem 0.6rem !important;
+  }
+  #main-header .logo {
+    font-size: 1.15rem;
+  }
+  #main-header .logo::before {
+    font-size: 1rem;
+  }
+  .search-input {
+    width: 95px;
+  }
+  .filter-quick-row {
+    grid-template-columns: 1fr;
+  }
+  .hero-stats {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
   }
 }
 
