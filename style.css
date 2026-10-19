@@ -1028,6 +1028,26 @@ body::before {
   box-shadow: 0 18px 40px -10px hsla(265, 89%, 60%, 1);
 }
 
+.download-btn-large.owned {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 12px 34px -10px rgba(16, 185, 129, 0.7) !important;
+  animation: none !important;
+}
+
+.download-btn-large.owned:hover {
+  box-shadow: 0 18px 40px -10px rgba(16, 185, 129, 0.95) !important;
+}
+
+.download-btn-large.in-cart {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  box-shadow: 0 12px 34px -10px rgba(245, 158, 11, 0.7) !important;
+  animation: none !important;
+}
+
+.download-btn-large.in-cart:hover {
+  box-shadow: 0 18px 40px -10px rgba(245, 158, 11, 0.95) !important;
+}
+
 /* Custom Dropdown Menu for Tags */
 .custom-dropdown-menu {
   position: absolute;

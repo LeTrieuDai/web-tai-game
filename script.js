@@ -1170,7 +1170,28 @@ async function downloadGame(gameName) {
   const slug = game ? game.slug : '';
   const isPurchased = (currentUser.purchased || []).includes(slug) || currentUser.role === 'admin';
   if (!isPurchased) {
-    alert('Bạn chưa sở hữu tựa game này! Vui lòng thêm vào giỏ hàng và thanh toán để nhận link tải Google Drive.');
+    const priceFormatted = (game && game.price ? game.price : 1000).toLocaleString('vi-VN') + 'đ';
+    const confirmAdd = confirm(`Bạn chưa sở hữu tựa game "${game ? game.name : gameName}"! Bạn có muốn thêm vào giỏ hàng (${priceFormatted}) để tiến hành thanh toán không?`);
+    if (confirmAdd) {
+      try {
+        const res = await fetch(`${API_URL}/cart/add`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username: currentUser.username, slug})
+        });
+        if (res.ok) {
+          const updatedUser = await res.json();
+          storage.set('currentUser', updatedUser);
+          if (typeof showToast === 'function') showToast(`🎉 Đã thêm ${game ? game.name : gameName} vào giỏ hàng!`);
+          if (typeof renderHeader === 'function') renderHeader();
+          const cartDropdown = document.getElementById('cart-dropdown');
+          if (cartDropdown) cartDropdown.classList.remove('hidden');
+          if (typeof renderGameDetailTags === 'function') await renderGameDetailTags();
+        }
+      } catch (err) {
+        console.error("Lỗi thêm giỏ hàng:", err);
+      }
+    }
     return;
   }
 
@@ -1324,35 +1345,82 @@ async function renderGameDetailTags() {
       container.innerHTML = '<span style="color:var(--muted); font-size:0.9rem;">Chưa có thể loại</span>';
     }
 
-    // Logic thay đổi nút Tải Game
+    // Lấy thông tin user hiện tại (Sửa lỗi crash ReferenceError: currentUser is not defined)
+    const currentUser = storage.get('currentUser', null);
+    const isOwned = currentUser && (currentUser.role === 'admin' || (currentUser.purchased || []).includes(slug));
+    const inCart = currentUser && (currentUser.cart || []).includes(slug);
+    const priceFormatted = (game.price || 1000).toLocaleString('vi-VN') + 'đ';
+
+    // Hiển thị giá bán trong phần thông tin game nếu chưa có
+    const infoSection = document.querySelector('.game-info-section');
+    if (infoSection && !document.getElementById('detail-game-price-item')) {
+      const priceItem = document.createElement('div');
+      priceItem.className = 'info-item';
+      priceItem.id = 'detail-game-price-item';
+      priceItem.innerHTML = `
+        <h4>Giá bán</h4>
+        <p style="font-size: 1.35rem; font-weight: 800; color: #f59e0b; margin-top: 4px;">${priceFormatted}</p>
+      `;
+      const tagsItem = container.closest('.info-item');
+      if (tagsItem) {
+        infoSection.insertBefore(priceItem, tagsItem);
+      } else {
+        infoSection.appendChild(priceItem);
+      }
+    }
+
+    // Logic thay đổi nút Tải Game / Mua Game
     const oldBtn = document.querySelector('.download-btn-large');
     if (oldBtn) {
         const newBtn = oldBtn.cloneNode(true);
         oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 
-        if (currentUser && currentUser.role === 'admin') {
-            newBtn.textContent = '📥 Tải game (Google Drive)';
+        // Reset class
+        newBtn.className = 'download-btn-large';
+
+        if (isOwned) {
+            newBtn.classList.add('owned');
+            newBtn.innerHTML = '<span>📥 Tải Game Ngay (Google Drive)</span>';
             newBtn.onclick = () => showDownloadGameModal(game);
-        } else if (currentUser && currentUser.purchased && currentUser.purchased.includes(slug)) {
-            newBtn.textContent = '📥 Tải game (Google Drive)';
-            newBtn.onclick = () => showDownloadGameModal(game);
+        } else if (inCart) {
+            newBtn.classList.add('in-cart');
+            newBtn.innerHTML = `<span>🛒 Đã có trong giỏ hàng (${priceFormatted}) - Mở giỏ hàng</span>`;
+            newBtn.onclick = () => {
+                const cartContainer = document.getElementById('cart-container');
+                const cartDropdown = document.getElementById('cart-dropdown');
+                if (cartDropdown) {
+                    cartDropdown.classList.remove('hidden');
+                } else if (cartContainer) {
+                    cartContainer.click();
+                }
+            };
         } else {
-            newBtn.textContent = '1.000đ';
+            newBtn.innerHTML = `<span>🛒 Thêm vào giỏ hàng (${priceFormatted})</span>`;
             newBtn.onclick = async () => {
-                if (!currentUser) {
+                const u = storage.get('currentUser', null);
+                if (!u) {
                     openModal('login-modal');
-                } else {
+                    if (typeof showToast === 'function') showToast('Vui lòng đăng nhập để mua game!');
+                    return;
+                }
+                try {
                     const res = await fetch(`${API_URL}/cart/add`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({username: currentUser.username, slug})
+                        body: JSON.stringify({username: u.username, slug})
                     });
                     if (res.ok) {
                         const updatedUser = await res.json();
                         storage.set('currentUser', updatedUser);
-                        showToast('Đã thêm vào giỏ hàng');
-                        renderHeader();
+                        if (typeof showToast === 'function') showToast(`🎉 Đã thêm ${game.name} vào giỏ hàng!`);
+                        if (typeof renderHeader === 'function') renderHeader();
+                        // Tự động mở giỏ hàng để user thấy ngay nút thanh toán
+                        const cartDropdown = document.getElementById('cart-dropdown');
+                        if (cartDropdown) cartDropdown.classList.remove('hidden');
+                        await renderGameDetailTags();
                     }
+                } catch (err) {
+                    console.error("Lỗi thêm vào giỏ hàng:", err);
                 }
             };
         }

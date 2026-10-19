@@ -65,7 +65,7 @@ function buildPage(g) {
                     <h3>Mô tả game</h3>
                     <p>${esc(g.desc)}</p>
 
-                    <button class="download-btn-large" onclick="downloadGame('${esc(g.name).replace(/'/g, "\\'")}')">Tải Game Ngay</button>
+                    <button class="download-btn-large" onclick="downloadGame('${esc(g.name).replace(/'/g, "\\'")}')">🛒 Thêm vào giỏ hàng (1.000đ)</button>
                 </div>
             </section>
 
