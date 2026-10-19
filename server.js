@@ -410,8 +410,8 @@ app.post('/api/sepay-webhook', async (req, res) => {
         // SePay có thể ghép thêm ký tự ngân hàng như "NAP ADMIN MBVCB..."
         let matchedUser = null;
 
-        // Cách 1: Regex tìm chữ sau từ khóa NAP hoặc NAPTIEN
-        const match = content.match(/(?:NAP|NAPTIEN)\s*([A-Z0-9_]+)/i);
+        // Cách 1: Regex tìm chữ sau từ khóa NAP hoặc NAPTIEN kèm số tiền (ví dụ: NAP5 DAI11, NAP10 DAI11, NAP DAI11)
+        const match = content.match(/(?:NAPTIEN|NAP)(?:\s*\d+k?|\s+)*\s*([A-Z0-9_]+)/i);
         if (match && match[1]) {
             const candidateUsername = match[1].toLowerCase();
             matchedUser = await User.findOne({ username: { $regex: new RegExp(`^${candidateUsername}$`, 'i') } });
@@ -420,8 +420,9 @@ app.post('/api/sepay-webhook', async (req, res) => {
         // Cách 2: Nếu chưa tìm thấy, quét tất cả users xem tên user nào xuất hiện trong content
         if (!matchedUser) {
             const allUsers = await User.find({}, 'username');
+            allUsers.sort((a, b) => (b.username || '').length - (a.username || '').length);
             for (const u of allUsers) {
-                if (content.includes(u.username.toUpperCase())) {
+                if (u.username && u.username.length >= 2 && content.includes(u.username.toUpperCase())) {
                     matchedUser = await User.findOne({ username: u.username });
                     break;
                 }

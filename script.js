@@ -2539,7 +2539,8 @@ function setupDepositModal() {
     const contentText = modal.querySelector('#qr-content-text');
 
     const safeAmount = Math.max(1000, parseInt(amount) || 10000);
-    const memo = `NAP ${user.username.toUpperCase()}`;
+    const amountInK = safeAmount % 1000 === 0 ? (safeAmount / 1000) : (safeAmount / 1000).toFixed(1);
+    const memo = `NAP${amountInK} ${user.username.toUpperCase()}`;
 
     // Cấu hình thông tin TPBank
     const bankId = 'TPB'; // Mã ngân hàng TPBank chuẩn Napas
