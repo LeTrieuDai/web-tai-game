@@ -1400,8 +1400,8 @@ body, #main-header, .game-card, .modal-content, .game-main-section, .game-info-s
 /* Hero */
 [data-theme="light"] .hero {
   background:
-    linear-gradient(120deg, hsla(0, 0%, 100%, 0.96) 38%, hsla(0, 0%, 100%, 0.55)),
-    url('https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/library_hero.jpg') center/cover no-repeat;
+    linear-gradient(120deg, hsla(0, 0%, 100%, 0.94) 38%, hsla(0, 0%, 100%, 0.55)),
+    url('https://cdn.cloudflare.steamstatic.com/steam/apps/1151640/library_hero.jpg') center/cover no-repeat;
   box-shadow: 0 30px 70px -30px hsla(232, 30%, 20%, 0.35);
 }
 
