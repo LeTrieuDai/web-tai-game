@@ -1016,6 +1016,12 @@ async function handleRegister(e) {
       closeModal('register-modal');
       renderHeader();
       renderTagsDropdown();
+      if (typeof renderGameDetailTags === 'function') {
+        try { await renderGameDetailTags(); } catch (_) {}
+      }
+      if (typeof showToast === 'function') {
+        showToast(`🎉 Đăng ký thành công! Chào mừng ${data.username}!`);
+      }
     } else {
       errorEl.textContent = data.error || 'Đăng ký thất bại';
     }
@@ -1044,6 +1050,12 @@ async function handleLogin(e) {
       closeModal('login-modal');
       renderHeader();
       renderTagsDropdown();
+      if (typeof renderGameDetailTags === 'function') {
+        try { await renderGameDetailTags(); } catch (_) {}
+      }
+      if (typeof showToast === 'function') {
+        showToast(`👋 Chào mừng ${data.username} đã đăng nhập!`);
+      }
     } else {
       errorEl.textContent = data.error || 'Sai tên đăng nhập hoặc mật khẩu';
     }
@@ -1065,6 +1077,45 @@ function logout() {
 /**
  * Đảm bảo modal tải game Google Drive tồn tại trên trang
  */
+/**
+ * Đảm bảo modal Đăng nhập và Đăng ký luôn sẵn sàng trên mọi trang (kể cả trang chi tiết game)
+ */
+function ensureAuthModalsExist() {
+  if (!document.getElementById('login-modal')) {
+    const loginModalHTML = `
+      <div class="modal hidden" id="login-modal">
+          <div class="modal-content">
+              <span class="close" data-close="login-modal">&times;</span>
+              <h2>Đăng nhập</h2>
+              <form id="login-form">
+                  <input type="text" id="login-username" placeholder="Tên đăng nhập" required autocomplete="username" />
+                  <input type="password" id="login-password" placeholder="Mật khẩu" required autocomplete="current-password" />
+                  <button type="submit">Đăng nhập</button>
+                  <p class="error-msg" id="login-error"></p>
+              </form>
+          </div>
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', loginModalHTML);
+  }
+
+  if (!document.getElementById('register-modal')) {
+    const registerModalHTML = `
+      <div class="modal hidden" id="register-modal">
+          <div class="modal-content">
+              <span class="close" data-close="register-modal">&times;</span>
+              <h2>Đăng ký</h2>
+              <form id="register-form">
+                  <input type="text" id="register-username" placeholder="Tên đăng ký" required autocomplete="username" />
+                  <input type="password" id="register-password" placeholder="Mật khẩu" required autocomplete="new-password" />
+                  <button type="submit">Đăng ký</button>
+                  <p class="error-msg" id="register-error"></p>
+              </form>
+          </div>
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', registerModalHTML);
+  }
+}
+
 function ensureDownloadModalExists() {
   if (document.getElementById('download-game-modal')) return;
   const modalHTML = `
@@ -1128,7 +1179,7 @@ async function showDownloadGameModal(gameOrSlug) {
 
   const gameTitle = game ? (game.name || 'Game') : 'Game';
   const rawUrl = game ? (game.downloadUrl || '') : '';
-  const finalUrl = (rawUrl && rawUrl.trim()) ? rawUrl.trim() : (game && game.slug ? `https://drive.google.com/drive/folders/game_${game.slug}` : 'https://drive.google.com');
+  const finalUrl = (rawUrl && rawUrl.trim()) ? rawUrl.trim() : (game && game.slug === 'limbo' ? 'https://drive.usercontent.google.com/download?id=1BrgIsHDEetXsovWqXaSSPLNSpxSj2No_&authuser=0' : (game && game.slug ? `https://drive.google.com/drive/folders/game_${game.slug}` : 'https://drive.google.com'));
 
   if (titleEl) titleEl.textContent = `Tải Game: ${gameTitle}`;
   if (inputEl) inputEl.value = finalUrl;
@@ -1221,19 +1272,23 @@ function bindEvents() {
   const loginBtn = document.getElementById('login-btn');
   const registerBtn = document.getElementById('register-btn');
 
-  if (loginBtn) loginBtn.addEventListener('click', (e) => {
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-      e.preventDefault();
-      openModal('login-modal');
-    }
-  });
+  ensureAuthModalsExist();
 
-  if (registerBtn) registerBtn.addEventListener('click', (e) => {
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+  if (loginBtn) {
+    loginBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      ensureAuthModalsExist();
+      openModal('login-modal');
+    });
+  }
+
+  if (registerBtn) {
+    registerBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      ensureAuthModalsExist();
       openModal('register-modal');
-    }
-  });
+    });
+  }
 
   document.querySelectorAll('.modal .close').forEach(btn => {
     const target = btn.getAttribute('data-close');
@@ -2817,6 +2872,7 @@ function setupAIChatWidget() {
 }
 
 async function initApp() {
+  if (typeof ensureAuthModalsExist === 'function') ensureAuthModalsExist();
   try { await renderHeader(); } catch (e) { console.error('Loi renderHeader:', e); }
   try { await renderTagsDropdown(); } catch (e) { console.error('Loi renderTagsDropdown:', e); }
   
@@ -2841,3 +2897,34 @@ async function initApp() {
 document.addEventListener('DOMContentLoaded', initApp);
 
 
+
+// Global delegation for login/register modals on all pages
+document.addEventListener('click', (e) => {
+  const loginTarget = e.target.closest('#login-btn, [data-open="login-modal"], a[href*="#login"]');
+  if (loginTarget) {
+    e.preventDefault();
+    if (typeof ensureAuthModalsExist === 'function') ensureAuthModalsExist();
+    openModal('login-modal');
+    return;
+  }
+  const regTarget = e.target.closest('#register-btn, [data-open="register-modal"], a[href*="#register"]');
+  if (regTarget) {
+    e.preventDefault();
+    if (typeof ensureAuthModalsExist === 'function') ensureAuthModalsExist();
+    openModal('register-modal');
+    return;
+  }
+  const closeBtn = e.target.closest('.close[data-close]');
+  if (closeBtn) {
+    const targetModal = closeBtn.getAttribute('data-close');
+    if (targetModal) closeModal(targetModal);
+  }
+});
+
+document.addEventListener('submit', (e) => {
+  if (e.target && e.target.id === 'login-form') {
+    handleLogin(e);
+  } else if (e.target && e.target.id === 'register-form') {
+    handleRegister(e);
+  }
+});

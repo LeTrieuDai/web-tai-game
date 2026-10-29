@@ -136,7 +136,7 @@ async function seedData() {
             { name: 'Grand Theft Auto V',slug: 'gta_v',             img: 'https://cdn.akamai.steamstatic.com/steam/apps/271590/header.jpg',   tags: ['Khám phá'] },
             { name: 'The Witcher 3',     slug: 'witcher_3',         img: 'https://cdn.akamai.steamstatic.com/steam/apps/292030/header.jpg',   tags: ['Khám phá'] },
             { name: 'Resident Evil 4',   slug: 're4',               img: 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/header.jpg',  tags: ['Kinh dị'] },
-            { name: 'Limbo',             slug: 'limbo',             img: 'https://cdn.akamai.steamstatic.com/steam/apps/48000/header.jpg',    tags: ['Giải đố', 'Kinh dị'] },
+            { name: 'Limbo',             slug: 'limbo',             img: 'https://cdn.akamai.steamstatic.com/steam/apps/48000/header.jpg',    tags: ['Giải đố', 'Kinh dị'], downloadUrl: 'https://drive.usercontent.google.com/download?id=1BrgIsHDEetXsovWqXaSSPLNSpxSj2No_&authuser=0' },
             { name: 'Subnautica',        slug: 'subnautica',        img: 'https://cdn.akamai.steamstatic.com/steam/apps/264710/header.jpg',   tags: ['Sinh tồn', 'Khám phá'] },
             { name: 'Little Nightmares', slug: 'little_nightmares', img: 'https://cdn.akamai.steamstatic.com/steam/apps/424840/header.jpg',   tags: ['Kinh dị', 'Giải đố'] },
             { name: 'Terraria',          slug: 'terraria',          img: 'https://cdn.akamai.steamstatic.com/steam/apps/105600/header.jpg',   tags: ['Sinh tồn', 'Khám phá'] },
@@ -178,6 +178,7 @@ async function seedData() {
                 { downloadUrl: null }
             ]
         });
+        await Game.updateOne({ slug: 'limbo' }, { $set: { downloadUrl: 'https://drive.usercontent.google.com/download?id=1BrgIsHDEetXsovWqXaSSPLNSpxSj2No_&authuser=0' } });
         if (gamesWithoutLink.length > 0) {
             for (const g of gamesWithoutLink) {
                 g.downloadUrl = `https://drive.google.com/drive/folders/game_${g.slug}`;
